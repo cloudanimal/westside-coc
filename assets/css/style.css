@@ -244,6 +244,9 @@ section { scroll-margin-top: 84px; }
   .about-grid, .visit-grid { grid-template-columns: 1fr; }
   .schedule { grid-template-columns: 1fr; }
 }
+@media (max-width: 600px) {
+  .event-inner::after { display: none; }
+}
 @media (max-width: 480px) {
   .visit-facts { grid-template-columns: 1fr; }
   .hero-times { flex-direction: column; }
