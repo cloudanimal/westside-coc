@@ -26,7 +26,8 @@ body {
 }
 img, iframe, svg { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
-h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.12; letter-spacing: -.01em; margin: 0; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.12; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+p { text-wrap: pretty; }
 section { scroll-margin-top: 84px; }
 .eyebrow {
   font-size: 13px; letter-spacing: .18em; text-transform: uppercase;
