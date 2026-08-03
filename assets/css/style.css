@@ -185,6 +185,32 @@ section { scroll-margin-top: 84px; }
 .event-desc { max-width: 60ch; color: #d9cfbf; margin: 0 0 22px; }
 .event-meta { font-size: 15px; color: #c8bda9; position: relative; z-index: 1; }
 
+.s-name em { font-style: normal; font-size: 12px; letter-spacing: .04em; color: var(--gold); font-weight: 600; }
+
+/* ---------- Beliefs ---------- */
+.beliefs { padding: clamp(52px, 8vw, 96px) 0; }
+.beliefs-intro { max-width: 62ch; margin: 16px auto 0; color: var(--ink-soft); }
+.belief-grid {
+  max-width: var(--maxw); margin: 40px auto 0; padding: 0 clamp(18px, 5vw, 48px);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+}
+.belief-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 26px 26px 28px; transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.belief-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.belief-card h3 { font-size: 21px; color: var(--navy); margin-bottom: 10px; }
+.belief-card p { margin: 0; font-size: 15.5px; color: var(--ink-soft); }
+.scripture {
+  max-width: 720px; margin: 40px auto 0; padding: 0 clamp(18px, 5vw, 48px);
+  text-align: center; font-family: var(--serif); font-size: clamp(19px, 2.4vw, 25px);
+  font-style: italic; color: var(--ink); line-height: 1.4;
+}
+.scripture cite {
+  display: block; margin-top: 14px; font-family: var(--sans); font-style: normal;
+  font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); font-weight: 600;
+}
+
 /* ---------- Visit ---------- */
 .visit { background: var(--cream-2); padding: clamp(52px, 8vw, 96px) 0; }
 .visit-grid {
@@ -216,7 +242,16 @@ section { scroll-margin-top: 84px; }
   font-weight: 600; transition: background .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
 }
 .contact-links a:hover { background: var(--gold); border-color: var(--gold); color: #23180a; }
-.contact-placeholder { font-size: 13px; color: #8f8676; margin-top: 24px; font-style: italic; }
+.contact-methods { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 0 0 26px; }
+.contact-method {
+  display: flex; flex-direction: column; gap: 4px; min-width: 220px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(216,178,94,.35);
+  border-radius: var(--radius); padding: 18px 24px; text-align: left;
+  transition: background .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
+}
+.contact-method:hover { background: rgba(255,255,255,.12); border-color: var(--gold); transform: translateY(-2px); }
+.cm-label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-soft); font-weight: 600; }
+.cm-value { font-family: var(--serif); font-size: 21px; font-weight: 600; color: #fff; }
 
 /* ---------- Footer ---------- */
 .site-footer { background: var(--navy-2); color: #c8bda9; padding: 40px clamp(18px, 5vw, 48px); }
@@ -243,6 +278,11 @@ section { scroll-margin-top: 84px; }
   .hero-card { max-width: 420px; }
   .about-grid, .visit-grid { grid-template-columns: 1fr; }
   .schedule { grid-template-columns: 1fr; }
+  .belief-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .belief-grid { grid-template-columns: 1fr; }
+  .contact-method { min-width: 0; width: 100%; }
 }
 @media (max-width: 600px) {
   .event-inner::after { display: none; }
