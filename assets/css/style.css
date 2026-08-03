@@ -199,7 +199,7 @@ section { scroll-margin-top: 84px; }
 
 /* ---------- Beliefs ---------- */
 .beliefs { padding: clamp(52px, 8vw, 96px) 0; }
-.beliefs-intro { max-width: 62ch; margin: 16px auto 0; color: var(--ink-soft); }
+.beliefs-intro { max-width: 62ch; margin: 16px auto 0; color: var(--ink-soft); text-wrap: balance; }
 .belief-grid {
   max-width: var(--maxw); margin: 40px auto 0; padding: 0 clamp(18px, 5vw, 48px);
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
