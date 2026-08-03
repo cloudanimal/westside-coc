@@ -1,6 +1,6 @@
-# West Newberry church of Christ Website
+# Westside church of Christ Website
 
-A simple, welcoming one-page site for West Newberry church of Christ (Newberry, FL),
+A simple, welcoming one-page site for Westside church of Christ (Newberry, FL),
 built from the congregation's public Facebook information and its "Who We Are" deck.
 
 ## Edit the content
