@@ -269,7 +269,7 @@ section { scroll-margin-top: 84px; }
 }
 
 /* ---------- Who we are not (distinction) ---------- */
-.distinct { padding: clamp(52px, 8vw, 96px) 0; }
+.distinct { padding: 0 0 clamp(52px, 8vw, 96px); }
 .distinct-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(18px, 5vw, 48px); }
 .distinct-head { text-align: center; max-width: 66ch; margin: 0 auto; }
 .distinct-head h2 { font-size: clamp(28px, 4vw, 44px); }
