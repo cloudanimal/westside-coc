@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://westsidenewberrychurchofchrist.com/sitemap.xml
