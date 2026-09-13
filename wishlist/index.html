@@ -220,8 +220,7 @@
   </div>
 
   <footer class="foot">
-    Your answers stay on this device until you send them. Questions? Reach us at
-    <a href="mailto:Lciolkosz@gmail.com">Lciolkosz@gmail.com</a> or 931-982-0376.
+    Your answers stay on this device until you send them.
   </footer>
 </div>
 
@@ -461,10 +460,14 @@ function submitWishlist(){
   });
 }
 
-function fetchCounts(){
+function fetchCounts(tries){
   if(!SCRIPT_URL) return;
-  fetch(SCRIPT_URL,{method:"GET"}).then(r=>r.json()).then(data=>{ if(data&&data.counts) applyCounts(data); })
-    .catch(()=>{ const b=document.getElementById("resultsBanner"); if(b&&RESULTS_MODE){b.textContent="Couldn't load results.";} });
+  tries=tries||0;
+  fetch(SCRIPT_URL,{method:"GET",cache:"no-store"}).then(r=>r.json()).then(data=>{ if(data&&data.counts) applyCounts(data); })
+    .catch(()=>{
+      if(tries<3){ setTimeout(()=>fetchCounts(tries+1), 800*(tries+1)); return; }
+      const b=document.getElementById("resultsBanner"); if(b&&RESULTS_MODE){b.textContent="Couldn't load results.";}
+    });
 }
 function applyCounts(data){
   const counts=data.counts||{};
