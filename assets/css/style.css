@@ -380,6 +380,16 @@ section { scroll-margin-top: 84px; }
 .cm-label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-soft); font-weight: 600; }
 .cm-value { font-family: var(--serif); font-size: 21px; font-weight: 600; color: #fff; }
 
+/* ---------- App wishlist CTA band ---------- */
+.appcta {
+  background: color-mix(in srgb, var(--gold) 12%, var(--cream));
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: clamp(44px, 6vw, 76px) clamp(18px, 5vw, 48px); text-align: center;
+}
+.appcta-inner { max-width: 720px; margin: 0 auto; }
+.appcta h2 { font-size: clamp(24px, 3.5vw, 34px); margin: 6px 0 12px; }
+.appcta p { color: var(--ink-soft); margin: 0 auto 26px; max-width: 54ch; }
+
 /* ---------- Footer ---------- */
 .site-footer { background: var(--navy-2); color: #c8bda9; padding: 40px clamp(18px, 5vw, 48px); }
 .foot-inner { max-width: var(--maxw); margin: 0 auto; text-align: center; }
