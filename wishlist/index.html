@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  /* Apply saved theme before paint to avoid a flash. No saved value = follow system. */
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<title>App Feature Wishlist — Westside church of Christ</title>
+<meta name="description" content="Tell us which features you'd like to see in the Westside church app." />
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f3a4d'/%3E%3Cpath d='M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z' fill='%23d8b25e'/%3E%3C/svg%3E" />
+<style>
+  :root{
+    --cream:#faf7f1; --cream-2:#f2ece0; --ink:#23303b; --ink-soft:#566773;
+    --navy:#1f3a4d; --navy-2:#17303f; --gold:#c1922f; --gold-soft:#d8b25e;
+    --line:#e6ddcd; --white:#ffffff; --on-brand:#ffffff; --brand-text:var(--navy);
+    --yes:#2f7a52; --yes-bg:#e2f0e7; --no:#8a8577; --no-bg:#eeece4; --star:#c1922f;
+    --radius:14px; --shadow:0 18px 50px -22px rgba(31,58,77,.35);
+    --sans:"Inter",Arial,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --ink-soft:#a6b6c1;
+      --line:#2b3c48; --brand-text:#9fc4de; --on-brand:#10202b;
+      --yes:#5fbf8c; --yes-bg:#173226; --no:#8fa0ac; --no-bg:#1b2a34; --star:#e0bd6a;
+      --shadow:0 18px 50px -22px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --ink-soft:#a6b6c1;
+    --line:#2b3c48; --brand-text:#9fc4de; --on-brand:#10202b;
+    --yes:#5fbf8c; --yes-bg:#173226; --no:#8fa0ac; --no-bg:#1b2a34; --star:#e0bd6a;
+    --shadow:0 18px 50px -22px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+
+  .site-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;
+    justify-content:space-between;padding:12px clamp(16px,5vw,40px);
+    background:var(--cream);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--brand-text);text-decoration:none;}
+  .brand svg{width:24px;height:24px;fill:var(--gold);}
+  .brand em{font-style:normal;font-weight:500;color:var(--ink-soft);}
+  .header-right{display:flex;align-items:center;gap:8px;}
+  .header-right a.home{font-size:13.5px;color:var(--ink-soft);text-decoration:none;padding:8px 10px;border-radius:8px;}
+  .header-right a.home:hover{color:var(--brand-text);}
+  .theme-toggle{background:transparent;border:1px solid var(--line);border-radius:9px;
+    width:38px;height:38px;cursor:pointer;color:var(--ink-soft);display:grid;place-items:center;}
+  .theme-toggle svg{width:18px;height:18px;fill:currentColor;}
+  .theme-toggle .icon-sun{display:none;}
+  :root[data-theme="dark"] .theme-toggle .icon-sun,
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .theme-toggle .icon-moon{display:none;}
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun{display:block;}}
+  :root[data-theme="dark"] .theme-toggle .icon-moon{display:none;}
+  :root[data-theme="dark"] .theme-toggle .icon-sun{display:block;}
+  :root[data-theme="light"] .theme-toggle .icon-sun{display:none;}
+  :root[data-theme="light"] .theme-toggle .icon-moon{display:block;}
+
+  .wrap{max-width:960px;margin:0 auto;padding:34px 20px 90px;}
+  .intro .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 10px;}
+  .intro h1{font-size:clamp(26px,4vw,36px);font-weight:700;margin:0 0 12px;letter-spacing:-.01em;}
+  .intro p{max-width:640px;color:var(--ink-soft);margin:0 0 6px;}
+
+  .yourinfo{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;margin:24px 0;box-shadow:var(--shadow);}
+  .yourinfo h2{font-size:15px;margin:0 0 12px;}
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+  .field label{font-size:13px;font-weight:600;color:var(--ink);}
+  .field .hint{font-weight:400;color:var(--ink-soft);}
+  .field input,.field textarea{font-family:inherit;font-size:15px;padding:10px 12px;
+    border:1px solid var(--line);border-radius:9px;background:var(--cream);color:var(--ink);}
+  .field input:focus,.field textarea:focus{outline:2px solid var(--gold-soft);outline-offset:0;border-color:var(--gold);}
+  @media(min-width:640px){.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;}
+    .info-grid .full{grid-column:1/-1;}}
+
+  .summary-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0;}
+  @media(min-width:640px){.summary-bar{grid-template-columns:repeat(3,1fr);}}
+  .chip{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .chip .num{font-size:26px;font-weight:700;}
+  .chip .lbl{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .chip.c-yes .num{color:var(--yes);}
+  .chip.c-star .num{color:var(--star);}
+  .chip.c-left .num{color:var(--ink-soft);}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .controls button{font-family:inherit;font-size:13px;background:var(--white);border:1px solid var(--line);
+    padding:8px 13px;border-radius:9px;cursor:pointer;color:var(--ink);}
+  .controls button:hover{border-color:var(--gold);}
+
+  details.cat{background:var(--white);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;}
+  details.cat>summary{cursor:pointer;list-style:none;padding:15px 18px;font-weight:700;font-size:16px;
+    background:var(--cream-2);display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  details.cat>summary::-webkit-details-marker{display:none;}
+  .cat-meta{display:flex;align-items:center;gap:10px;font-weight:500;font-size:12px;color:var(--ink-soft);}
+  .cat-badge{background:var(--yes-bg);color:var(--yes);font-weight:700;border-radius:20px;padding:2px 9px;font-size:11.5px;}
+  .cat-badge[data-n="0"]{background:transparent;color:var(--ink-soft);}
+  .chev{transition:transform .15s;display:inline-block;}
+  details[open] .chev{transform:rotate(90deg);}
+
+  .row{display:grid;grid-template-columns:1fr;gap:12px;padding:14px 18px;border-top:1px solid var(--line);}
+  @media(min-width:620px){.row{grid-template-columns:minmax(0,1fr) auto;align-items:center;}}
+  .feat-name{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .feat-desc{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+  .feat-badge{font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    padding:2px 8px;border-radius:20px;white-space:nowrap;}
+  .feat-badge.have{background:var(--yes-bg);color:var(--yes);}
+  .feat-badge.partial{background:#fdf1d8;color:#9a6b16;}
+  :root[data-theme="dark"] .feat-badge.partial{background:#2a2415;color:var(--gold-soft);}
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .feat-badge.partial{background:#2a2415;color:var(--gold-soft);}}
+  .feat-votes{font-size:13px;margin-top:5px;font-weight:600;color:var(--ink-soft);}
+  .feat-votes .v-yes{color:var(--yes);}
+  .feat-votes .v-star{color:var(--star);margin-left:10px;}
+  .results-banner{background:var(--white);border:1px solid var(--line);border-radius:12px;
+    padding:12px 16px;margin-bottom:16px;font-weight:700;color:var(--brand-text);}
+  .pick{display:flex;gap:6px;align-items:center;}
+  .toggle{font-family:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:9px;
+    border:1px solid var(--line);background:var(--cream);color:var(--ink-soft);cursor:pointer;min-width:56px;}
+  .toggle.on-yes{background:var(--yes-bg);border-color:var(--yes);color:var(--yes);}
+  .toggle.on-no{background:var(--no-bg);border-color:var(--no);color:var(--no);}
+  .star{font-size:18px;line-height:1;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
+    background:var(--cream);color:var(--ink-soft);cursor:pointer;opacity:.45;}
+  .star.show{opacity:1;}
+  .star.active{background:#fff6e2;border-color:var(--star);color:var(--star);}
+  :root[data-theme="dark"] .star.active,
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .star.active{background:#2a2415;}}
+  .star:disabled{cursor:default;}
+
+  .actions{position:sticky;bottom:0;background:var(--cream);border-top:1px solid var(--line);
+    margin:26px -20px 0;padding:16px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{font-family:inherit;font-size:14.5px;font-weight:600;padding:11px 18px;border-radius:10px;cursor:pointer;border:1px solid var(--line);}
+  .btn-primary{background:var(--navy);color:var(--on-brand);border-color:var(--navy);}
+  .btn-primary:hover{background:var(--navy-2);}
+  .btn-ghost{background:var(--white);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--gold);}
+  .save-note{font-size:12px;color:var(--ink-soft);margin-left:auto;}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;
+    box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  footer.foot{color:var(--ink-soft);font-size:12.5px;max-width:640px;margin:30px auto 0;text-align:center;line-height:1.6;}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="/">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 5h2v6h6v2h-6v14h-2V13H9v-2h6z"/></svg>
+    <span>Westside <em>church of Christ</em></span>
+  </a>
+  <div class="header-right">
+    <a class="home" href="/">&larr; Home</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm11-11a1 1 0 0 1-1 1h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1zM5 12a1 1 0 0 1-1 1H2a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1zm14.07-6.07a1 1 0 0 1 0 1.41l-1.41 1.42a1 1 0 1 1-1.42-1.42l1.42-1.41a1 1 0 0 1 1.41 0zM7.76 17.66a1 1 0 0 1 0 1.41l-1.42 1.42a1 1 0 0 1-1.41-1.42l1.41-1.41a1 1 0 0 1 1.42 0zm11.31 1.41a1 1 0 0 1-1.41 0l-1.42-1.41a1 1 0 0 1 1.42-1.42l1.41 1.42a1 1 0 0 1 0 1.41zM7.76 6.34a1 1 0 0 1-1.42 0L4.93 4.93a1 1 0 0 1 1.41-1.41l1.42 1.41a1 1 0 0 1 0 1.41z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="intro">
+    <p class="eyebrow">Help shape our church app</p>
+    <h1>App Feature Wishlist</h1>
+    <p>We're planning a church app and want to build what's actually useful to you. Go through the list below and mark each feature <strong>Yes</strong> (I'd use this) or <strong>No</strong> (not needed). Tap the star on anything that's a <strong>must-have</strong>.</p>
+    <p>There are no wrong answers, and you don't have to mark everything. You can see how many others want each feature, too. Your picks save on this device as you go.</p>
+  </div>
+
+  <div class="yourinfo">
+    <h2>Your info</h2>
+    <div class="info-grid">
+      <div class="field">
+        <label for="mName">Name</label>
+        <input id="mName" type="text" autocomplete="name" placeholder="First and last name" />
+      </div>
+      <div class="field">
+        <label for="mContact">Email or phone <span class="hint">(optional)</span></label>
+        <input id="mContact" type="text" autocomplete="email" placeholder="So we can follow up" />
+      </div>
+      <div class="field full">
+        <label for="mNote">Anything else you'd love the app to do? <span class="hint">(optional)</span></label>
+        <textarea id="mNote" rows="2" placeholder="Ideas, comments, or a feature we didn't list"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="chip c-yes"><div class="num" id="cntYes">0</div><div class="lbl">Features you want</div></div>
+    <div class="chip c-star"><div class="num" id="cntStar">0</div><div class="lbl">Must-haves</div></div>
+    <div class="chip c-left"><div class="num" id="cntLeft">0</div><div class="lbl">Not yet marked</div></div>
+  </div>
+
+  <div class="controls">
+    <button type="button" onclick="expandAll(true)">Expand all</button>
+    <button type="button" onclick="expandAll(false)">Collapse all</button>
+    <button type="button" onclick="clearAll()">Clear my answers</button>
+  </div>
+
+  <div class="results-banner" id="resultsBanner" hidden></div>
+
+  <div id="checklist"></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" type="button" id="sendBtn" onclick="submitWishlist()">Send my wishlist</button>
+    <button class="btn btn-ghost" type="button" onclick="copySummary()">Copy summary</button>
+    <button class="btn btn-ghost" type="button" onclick="downloadSummary()">Download</button>
+    <span class="save-note" id="saveNote">Saved on this device</span>
+  </div>
+
+  <footer class="foot">
+    Your answers stay on this device until you send them. Questions? Reach us at
+    <a href="mailto:Lciolkosz@gmail.com">Lciolkosz@gmail.com</a> or 931-982-0376.
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---- Backend. Paste the deployed Google Apps Script web-app URL here to turn on
+   online submitting + live vote counts. Leave "" for offline copy/download mode.
+   Add ?results to the page URL for an admin view of the running tallies. ---- */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYhLQiSya675zhteF_dMXXJtHOU9iAQxY3QKLp2Jxb8rL85bkMHxBDoc8ZQKMubPROSA/exec";
+const RESULTS_MODE = new URLSearchParams(location.search).has("results");
+
+const DATA = [
+  { cat:"Church Website", open:true, items:[
+    ["A refreshed church website", "A clean, modern site connected to the app.", "have"],
+    ["Custom homepage wording", "Homepage text written specifically for us.", "have"],
+    ["Professionally written pages", "Polished wording across all the pages.", "have"],
+    ["“Plan your visit” page", "A page that helps first-time guests know what to expect.", "partial"],
+    ["Easy site updates", "A simple way to keep the website current.", "partial"],
+    ["Welcome video", "A short, edited welcome video for visitors."],
+    ["Homepage background video", "Gentle background video behind the homepage banner."],
+    ["Announcement banners", "Reusable banners for upcoming events."],
+    ["Event & sermon-series pages", "Dedicated pages for special series or events."],
+    ["Move our sermons & classes over", "Bring existing recordings to the new site."],
+    ["Weekly sermon & class posting", "Each week's lesson posted for you."],
+  ]},
+  { cat:"Members Only App", open:false, items:[
+    ["Church directory", "A searchable list of members with photos and contact info."],
+    ["Duty assigner", "Schedule who serves each week (song leading, prayers, communion)."],
+    ["Calendar & events", "One shared calendar for services, classes, and events."],
+    ["Prayer wall", "Post prayer requests and follow how God answers them."],
+    ["In-app messaging", "Send and receive messages right inside the app."],
+    ["Attendance tracking", "A simple way to record and review attendance."],
+    ["Photo board", "A shared gallery for photos of church life."],
+    ["Member map", "See roughly where members live, to help with rides and visits."],
+    ["File & document sharing", "Bulletins, class handouts, and study materials in one place."],
+    ["Online giving", "Give a contribution securely through the app."],
+    ["Text announcements", "Leaders can text reminders and announcements to members."],
+    ["Import from our old records", "Bring existing member info over so nothing is retyped."],
+  ]},
+  { cat:"Reaching Visitors", open:false, items:[
+    ["Digital welcome card", "A QR code or text link guests use to say hello."],
+    ["Printed welcome card", "A physical card to hand to guests."],
+    ["“Plan your visit” follow-up", "A friendly follow-up after someone plans a visit."],
+    ["Guest follow-up plan (40 days)", "A steady 40-day plan for staying in touch with guests."],
+    ["Free study booklet", "A downloadable booklet that introduces people to us."],
+  ]},
+  { cat:"Being Found Online", open:false, items:[
+    ["Google listing setup", "Get the church showing correctly on Google and Maps."],
+    ["Local directory listings", "List us accurately across common local directories."],
+    ["Search-friendly pages", "Set up pages so people searching can find us."],
+    ["Google reviews plan", "A gentle plan to gather honest reviews."],
+    ["Articles that help people find us", "Written articles aimed at community searches."],
+  ]},
+  { cat:"Social Media", open:false, items:[
+    ["A social media plan", "A simple plan for what to post and when."],
+    ["Sermon clips", "Short video clips from lessons for sharing."],
+    ["Designed social graphics", "Nice-looking banners and images for posts."],
+    ["Event promotion posts", "Ready-made posts for events."],
+  ]},
+  { cat:"Outreach Extras", open:false, items:[
+    ["Follow-up emails", "Automatic, warm emails to people who reach out."],
+    ["A written outreach plan", "A plan for how we reach the Newberry community."],
+    ["Clear core message", "Help putting our purpose into plain, inviting words."],
+    ["Church tagline", "A short, memorable phrase for the church."],
+    ["Logo, fonts & colors guide", "A simple, consistent look across everything."],
+  ]},
+];
+
+const KEY = "westside_wishlist_v1";
+let state = { info:{}, picks:{} }; // picks: key -> { want:"yes"|"no"|null, star:bool }
+
+function k(cat,name){ return cat+"::"+name; }
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+
+function load(){
+  try{ const raw=localStorage.getItem(KEY); if(raw) state=Object.assign({info:{},picks:{}}, JSON.parse(raw)); }catch(e){}
+}
+function save(){
+  state.info = {
+    name: document.getElementById("mName").value.trim(),
+    contact: document.getElementById("mContact").value.trim(),
+    note: document.getElementById("mNote").value.trim(),
+  };
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function render(){
+  const root=document.getElementById("checklist");
+  root.textContent="";
+  DATA.forEach(section=>{
+    const det=document.createElement("details");
+    det.className="cat"; det.open=section.open;
+    const sum=document.createElement("summary");
+    const title=document.createElement("span"); title.textContent=section.cat;
+    const meta=document.createElement("span"); meta.className="cat-meta";
+    const badge=document.createElement("span"); badge.className="cat-badge"; badge.dataset.cat=section.cat;
+    const count=document.createElement("span"); count.className="cat-count"; count.textContent=section.items.length+" features";
+    const chev=document.createElement("span"); chev.className="chev"; chev.textContent="▸";
+    meta.append(badge,count,chev);
+    sum.append(title,meta); det.append(sum);
+
+    section.items.forEach(([name,desc,status])=>{
+      const key=k(section.cat,name);
+      const p = state.picks[key] || {};
+      const row=document.createElement("div"); row.className="row";
+      const left=document.createElement("div");
+      const nm=document.createElement("div"); nm.className="feat-name"; nm.textContent=name;
+      if(status){
+        const badge=document.createElement("span");
+        badge.className="feat-badge "+status;
+        badge.textContent = status==="have" ? "Already have ✓" : "Partly done";
+        nm.append(badge);
+      }
+      const ds=document.createElement("div"); ds.className="feat-desc"; ds.textContent=desc;
+      const vt=document.createElement("div"); vt.className="feat-votes"; vt.dataset.key=key; vt.hidden=true;
+      left.append(nm,ds,vt);
+
+      const pick=document.createElement("div"); pick.className="pick"; pick.dataset.key=key;
+      const yes=document.createElement("button"); yes.type="button"; yes.className="toggle"; yes.textContent="Yes"; yes.dataset.v="yes";
+      const no=document.createElement("button"); no.type="button"; no.className="toggle"; no.textContent="No"; no.dataset.v="no";
+      const star=document.createElement("button"); star.type="button"; star.className="star"; star.textContent="★"; star.title="Mark as a must-have"; star.setAttribute("aria-label","Mark as must-have");
+      pick.append(yes,no,star);
+
+      yes.onclick=()=>setWant(key,"yes");
+      no.onclick=()=>setWant(key,"no");
+      star.onclick=()=>toggleStar(key);
+
+      row.append(left,pick); det.append(row);
+      paintRow(key);
+    });
+    root.append(det);
+  });
+}
+
+function setWant(key,v){
+  const p=state.picks[key]||(state.picks[key]={});
+  p.want=(p.want===v)?null:v;
+  if(p.want!=="yes") p.star=false;
+  paintRow(key); updateCounts(); save();
+}
+function toggleStar(key){
+  const p=state.picks[key]; if(!p||p.want!=="yes") return;
+  p.star=!p.star; paintRow(key); updateCounts(); save();
+}
+function paintRow(key){
+  const pick=document.querySelector('.pick[data-key="'+CSS.escape(key)+'"]'); if(!pick) return;
+  const p=state.picks[key]||{};
+  const yes=pick.querySelector('[data-v="yes"]'), no=pick.querySelector('[data-v="no"]'), star=pick.querySelector('.star');
+  yes.classList.toggle("on-yes", p.want==="yes");
+  no.classList.toggle("on-no", p.want==="no");
+  const isYes=p.want==="yes";
+  star.classList.toggle("show", isYes);
+  star.disabled=!isYes;
+  star.classList.toggle("active", isYes && !!p.star);
+}
+function updateCounts(){
+  let yes=0,star=0,total=0;
+  DATA.forEach(s=>s.items.forEach(([n])=>{ total++; const p=state.picks[k(s.cat,n)]; if(p&&p.want==="yes"){yes++; if(p.star)star++;} }));
+  document.getElementById("cntYes").textContent=yes;
+  document.getElementById("cntStar").textContent=star;
+  document.getElementById("cntLeft").textContent=total-Object.values(state.picks).filter(p=>p&&(p.want==="yes"||p.want==="no")).length;
+  DATA.forEach(s=>{
+    const b=document.querySelector('.cat-badge[data-cat="'+CSS.escape(s.cat)+'"]'); if(!b) return;
+    const n=s.items.filter(([nm])=>{const p=state.picks[k(s.cat,nm)];return p&&p.want==="yes";}).length;
+    b.textContent=n+" yes"; b.dataset.n=n;
+  });
+}
+
+function expandAll(open){ document.querySelectorAll("#checklist details").forEach(d=>d.open=open); }
+function clearAll(){
+  if(!confirm("Clear all of your answers on this device?")) return;
+  state.picks={}; render(); updateCounts(); save(); toast("Answers cleared");
+}
+
+function buildSummary(){
+  const info=state.info||{};
+  const lines=[];
+  lines.push("WESTSIDE CHURCH APP — FEATURE WISHLIST");
+  lines.push("Submitted: "+new Date().toLocaleString());
+  lines.push("Name: "+(info.name||"(not given)"));
+  if(info.contact) lines.push("Contact: "+info.contact);
+  lines.push("");
+  let anyYes=false;
+  DATA.forEach(s=>{
+    const yes=s.items.filter(([n])=>{const p=state.picks[k(s.cat,n)];return p&&p.want==="yes";});
+    if(!yes.length) return;
+    anyYes=true;
+    lines.push(s.cat.toUpperCase());
+    yes.forEach(([n])=>{ const p=state.picks[k(s.cat,n)]; lines.push("  "+(p.star?"★ ":"• ")+n); });
+    lines.push("");
+  });
+  if(!anyYes) lines.push("(No features marked Yes yet.)","");
+  if(info.note) lines.push("OTHER IDEAS:",info.note,"");
+  lines.push("★ = must-have");
+  return lines.join("\n");
+}
+
+function copySummary(){
+  save();
+  const text=buildSummary();
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Summary copied")).catch(()=>fallbackCopy(text));
+  } else fallbackCopy(text);
+}
+function fallbackCopy(text){
+  const ta=document.createElement("textarea"); ta.value=text; document.body.append(ta); ta.select();
+  try{document.execCommand("copy"); toast("Summary copied");}catch(e){toast("Copy not supported — use Download");}
+  ta.remove();
+}
+function downloadSummary(){
+  save();
+  const blob=new Blob([buildSummary()],{type:"text/plain"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="westside-app-wishlist.txt"; document.body.append(a); a.click();
+  a.remove(); URL.revokeObjectURL(url); toast("Downloaded");
+}
+
+function submitWishlist(){
+  save();
+  if(!state.info.name){ document.getElementById("mName").focus(); toast("Please add your name first"); return; }
+  if(!SCRIPT_URL){ copySummary(); toast("Copied — online sending not set up yet"); return; }
+  const btn=document.getElementById("sendBtn"); btn.disabled=true; btn.textContent="Sending…";
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({ name:state.info.name, contact:state.info.contact||"", note:state.info.note||"", picks:state.picks }),
+  }).then(r=>r.json()).then(data=>{
+    state.submitted=true; save();
+    btn.textContent="Sent ✓"; toast("Thank you! Your wishlist was sent.");
+    if(data&&data.counts) applyCounts(data);
+    reveal(true);
+  }).catch(()=>{
+    btn.disabled=false; btn.textContent="Send my wishlist";
+    toast("Couldn't send — please use Copy or Download."); copySummary();
+  });
+}
+
+function fetchCounts(){
+  if(!SCRIPT_URL) return;
+  fetch(SCRIPT_URL,{method:"GET"}).then(r=>r.json()).then(data=>{ if(data&&data.counts) applyCounts(data); })
+    .catch(()=>{ const b=document.getElementById("resultsBanner"); if(b&&RESULTS_MODE){b.textContent="Couldn't load results.";} });
+}
+function applyCounts(data){
+  const counts=data.counts||{};
+  document.querySelectorAll(".feat-votes").forEach(el=>{
+    const c=counts[el.dataset.key]||{y:0,s:0};
+    el.textContent="";
+    const y=document.createElement("span"); y.className="v-yes"; y.textContent="👍 "+(c.y||0)+" want this";
+    el.append(y);
+    if(c.s){ const s=document.createElement("span"); s.className="v-star"; s.textContent="★ "+c.s+" must-have"; el.append(s); }
+  });
+  const banner=document.getElementById("resultsBanner");
+  if(banner){ banner.hidden=false; banner.textContent=(data.total||0)+" response"+(data.total===1?"":"s")+" so far"; }
+}
+function reveal(lock){
+  document.querySelectorAll(".feat-votes").forEach(el=>el.hidden=false);
+  if(lock){ document.querySelectorAll(".toggle,.star").forEach(b=>b.disabled=true); }
+}
+
+/* theme toggle */
+document.getElementById("themeToggle").addEventListener("click",()=>{
+  const cur=document.documentElement.getAttribute("data-theme");
+  let next;
+  if(cur==="dark") next="light"; else if(cur==="light") next="dark";
+  else next=window.matchMedia("(prefers-color-scheme: dark)").matches?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  try{localStorage.setItem("theme",next);}catch(e){}
+});
+
+/* init */
+load();
+document.getElementById("mName").value=(state.info&&state.info.name)||"";
+document.getElementById("mContact").value=(state.info&&state.info.contact)||"";
+document.getElementById("mNote").value=(state.info&&state.info.note)||"";
+["mName","mContact","mNote"].forEach(id=>document.getElementById(id).addEventListener("input",()=>{save();}));
+render(); updateCounts();
+
+if(RESULTS_MODE){
+  document.querySelector(".yourinfo").hidden=true;
+  document.querySelector(".summary-bar").hidden=true;
+  document.getElementById("sendBtn").hidden=true;
+  const rb=document.getElementById("resultsBanner"); rb.hidden=false; rb.textContent="Loading results…";
+}
+if(SCRIPT_URL){ reveal(false); fetchCounts(); }      // counts visible to everyone, from the start
+if(state.submitted && !RESULTS_MODE){                 // this device already voted — lock it
+  const btn=document.getElementById("sendBtn"); btn.textContent="Submitted ✓"; btn.disabled=true;
+  document.querySelectorAll(".toggle,.star").forEach(b=>b.disabled=true);
+}
+</script>
+</body>
+</html>
