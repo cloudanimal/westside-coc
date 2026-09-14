@@ -147,11 +147,21 @@
       <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" /></div>
       <button class="btn" id="saveProfileBtn">Save my entry</button>
       <div id="profileNote"></div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" id="downloadMe" style="font-size:13px;padding:8px 14px;">Download my data</button>
+        <button class="btn btn-ghost" id="deleteMe" style="font-size:13px;padding:8px 14px;color:#a1442f;border-color:#e3b7ad;">Delete my account</button>
+      </div>
     </div>
 
     <section id="adminPanel" hidden>
+      <div class="section-head"><h2>Admin</h2></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px;">
+        <button class="btn btn-ghost" id="exportCsv" style="font-size:13px;padding:8px 14px;">Export members (CSV)</button>
+        <button class="btn btn-ghost" id="backupJson" style="font-size:13px;padding:8px 14px;">Download backup (JSON)</button>
+      </div>
+      <p class="muted" style="font-size:12px;margin:0 0 16px;">Backups include every member (pending and approved). Keep them somewhere safe as your off-site copy.</p>
       <div class="section-head">
-        <h2>Pending approvals</h2>
+        <h2 style="font-size:17px;">Pending approvals</h2>
         <span class="muted" id="pendingCount"></span>
       </div>
       <div class="dir-grid" id="pendingList"></div>
@@ -194,6 +204,9 @@ function initialsAvatar(name){
   return "data:image/svg+xml,"+encodeURIComponent(svg);
 }
 function setAvatar(img, url, name){ img.src = url || initialsAvatar(name); }
+function downloadBlob(filename, text, type){ const b=new Blob([text],{type}); const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download=filename; document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(u); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function csvCell(v){ v=(v==null?"":String(v)); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
 
 // ---- Auth: send magic link ----
 $("sendLinkBtn").addEventListener("click", async ()=>{
@@ -263,6 +276,22 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
   btn.disabled=false; btn.textContent="Save my entry";
   if(error){ note($("profileNote"), error.message, "err"); }
   else { note($("profileNote"), "Saved.", "ok"); loadDirectory(); $("onboardNotice").hidden = !!$("pName").value.trim(); }
+});
+
+// ---- Member: download my data / delete my account ----
+$("downloadMe").addEventListener("click", async ()=>{
+  const { data:{ user } } = await sb.auth.getUser(); if(!user) return;
+  const { data } = await sb.from("profiles").select("*").eq("id", user.id).single();
+  downloadBlob("my-westside-profile.json", JSON.stringify({ account:{ id:user.id, email:user.email }, profile:data }, null, 2), "application/json");
+  toast("Downloaded your data");
+});
+$("deleteMe").addEventListener("click", async ()=>{
+  if(!confirm("Delete your account and remove your directory entry? This permanently erases your profile and cannot be undone.")) return;
+  const { error } = await sb.rpc("delete_own_account");
+  if(error){ toast(error.message); return; }
+  await sb.auth.signOut();
+  alert("Your account has been deleted.");
+  location.reload();
 });
 
 let dirPeople = [];
@@ -348,6 +377,25 @@ async function setStatus(id,status){
   await loadPending();
   await loadDirectory();
 }
+
+// ---- Admin: export / backup all members ----
+async function fetchAllMembers(){
+  const { data, error } = await sb.from("profiles").select("*").order("full_name");
+  if(error){ toast(error.message); return null; }
+  return data||[];
+}
+$("exportCsv").addEventListener("click", async ()=>{
+  const rows = await fetchAllMembers(); if(!rows) return;
+  const cols=["full_name","email","phone","family","address","birthday","role","status","created_at"];
+  const csv=[cols.join(",")].concat(rows.map(r=>cols.map(c=>csvCell(r[c])).join(","))).join("\r\n");
+  downloadBlob("westside-members-"+todayStr()+".csv", csv, "text/csv");
+  toast("Exported "+rows.length+" members");
+});
+$("backupJson").addEventListener("click", async ()=>{
+  const rows = await fetchAllMembers(); if(!rows) return;
+  downloadBlob("westside-members-backup-"+todayStr()+".json", JSON.stringify({ exported:new Date().toISOString(), count:rows.length, members:rows }, null, 2), "application/json");
+  toast("Backup downloaded ("+rows.length+")");
+});
 
 // ---- Boot: decide which view to show ----
 async function boot(){
