@@ -142,6 +142,13 @@
 
   /* ---- App shell ---- */
   .topbar{position:sticky;top:0;z-index:70;display:flex;align-items:center;justify-content:space-between;gap:10px;height:56px;padding:0 clamp(14px,4vw,26px);background:var(--cream);border-bottom:1px solid var(--line);}
+  #installBar{display:flex;align-items:center;gap:10px;padding:9px clamp(14px,4vw,26px);background:var(--navy);color:var(--on-brand);font-size:13.5px;font-weight:500;}
+  #installBar svg{width:24px;height:24px;flex:none;border-radius:6px;}
+  #installBar #installMsg{flex:1;min-width:0;}
+  #installBar #installBtn{flex:none;background:var(--gold-soft);color:var(--navy-2);border:0;border-radius:8px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;}
+  #installBar #installBtn:hover{filter:brightness(1.05);}
+  #installBar #installClose{flex:none;background:transparent;border:0;color:var(--on-brand);opacity:.75;font-size:20px;line-height:1;cursor:pointer;padding:2px 4px;}
+  #installBar #installClose:hover{opacity:1;}
   .brand{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--brand-text);text-decoration:none;}
   .brand svg{width:22px;height:22px;fill:var(--gold);}
   .brand em{font-style:normal;font-weight:500;color:var(--ink-soft);}
@@ -177,6 +184,12 @@
 </style>
 </head>
 <body>
+<div id="installBar" hidden>
+  <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1f3a4d"/><path d="M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z" fill="#d8b25e"/></svg>
+  <span id="installMsg">Install this app on your phone for quick, full-screen access.</span>
+  <button type="button" id="installBtn">Install</button>
+  <button type="button" id="installClose" aria-label="Dismiss">&times;</button>
+</div>
 <header class="topbar">
   <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 5h2v6h6v2h-6v14h-2V13H9v-2h6z"/></svg><span>Westside <em>members</em></span></a>
   <div class="tb-right">
@@ -989,6 +1002,39 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch((e) => console.warn("SW registration failed", e));
   });
 }
+
+// PWA install hint — only in a browser tab (not once installed), and dismissible.
+(function(){
+  var bar=$("installBar"), btn=$("installBtn"), closeBtn=$("installClose"), msg=$("installMsg");
+  if(!bar) return;
+  var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  var dismissed = false; try { dismissed = localStorage.getItem("westside_install_dismissed")==="1"; } catch(e){}
+  if(standalone || dismissed) return;
+  var deferred=null;
+  function show(){ bar.hidden=false; }
+  closeBtn.addEventListener("click", function(){ bar.hidden=true; try{ localStorage.setItem("westside_install_dismissed","1"); }catch(e){} });
+
+  // Android/Chrome: real install prompt.
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); deferred=e; show();
+  });
+  btn.addEventListener("click", async function(){
+    if(!deferred) return;
+    deferred.prompt();
+    try { await deferred.userChoice; } catch(e){}
+    deferred=null; bar.hidden=true;
+  });
+
+  // iOS Safari: no prompt event — show Add-to-Home-Screen instructions instead.
+  var ua=navigator.userAgent||"";
+  var isIOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  var isSafari=/^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua);
+  if(isIOS && isSafari){
+    btn.hidden=true;
+    msg.innerHTML='Install this app: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.';
+    show();
+  }
+})();
 </script>
 </body>
 </html>
