@@ -99,14 +99,14 @@ const PHASES = [
   ]},
   { name:"Communication", tag:"next", tagText:"Phase 2", items:[
     ["Announcements / bulletin board", "Post/read/delete gated by the RBAC 'announcements' permission: Read sees them, Write can post + delete own, Full control deletes any. First feature wired to can().", "done"],
-    ["Prayer wall", "Post requests, follow them, mark answered.", ""],
+    ["Prayer wall", "Post requests, a 🙏 'praying' toggle with counts, and mark-answered — gated by RBAC 'prayer_wall'.", "done"],
     ["Text / email blasts", "Admin to members — where Flocknote/Twilio plug in.", ""],
     ["Notifications", "Email or push when something is posted.", ""],
   ]},
   { name:"Calendar & serving", tag:"next", tagText:"Phase 2", items:[
-    ["Church calendar", "Services, classes, and events in one place.", ""],
-    ["Event details + RSVP / sign-ups", "Meals, nursery, cleaning rotations.", ""],
-    ["Duty scheduler", "Who leads singing, prayers, communion, teaching each week.", ""],
+    ["Church calendar", "Upcoming events with date, time, location, and details (RBAC 'calendar').", "done"],
+    ["Event details + RSVP / sign-ups", "Going / Maybe / Can't RSVP with live counts on each event.", "done"],
+    ["Duty scheduler", "Assign who serves each week (song leader, prayers, communion, teaching…), grouped by date; new RBAC 'scheduling' section.", "done"],
     ["Calendar export", "Subscribe from a phone calendar.", ""],
   ]},
   { name:"Ministry & care", tag:"later", tagText:"Phase 3", items:[
