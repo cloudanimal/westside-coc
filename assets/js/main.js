@@ -18,6 +18,23 @@
     });
   });
 
+  // Members dropdown (Portal / Wishlist)
+  var dd = document.getElementById("membersDd");
+  var ddToggle = document.getElementById("membersDdToggle");
+  if (dd && ddToggle) {
+    ddToggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var open = dd.classList.toggle("open");
+      ddToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    document.addEventListener("click", function (e) {
+      if (!dd.contains(e.target)) {
+        dd.classList.remove("open");
+        ddToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
   document.getElementById("year").textContent = new Date().getFullYear();
 
   // Dark / light mode toggle. Default follows system; a manual choice is saved.
