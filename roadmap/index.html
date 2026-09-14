@@ -46,6 +46,9 @@
   .tag.pri{background:var(--pri-bg);color:var(--pri);}
   .tag.next{background:var(--done-bg);color:var(--done);}
   .tag.later{background:var(--later-bg);color:var(--later);}
+  .phase-right{display:flex;align-items:center;gap:10px;}
+  .phase-count{font-size:12px;font-weight:700;color:var(--soft);white-space:nowrap;}
+  .phase-count.all-done{color:var(--done);}
   .item{display:flex;gap:12px;padding:13px 18px;border-top:1px solid var(--line);align-items:flex-start;}
   .item input{margin-top:3px;width:17px;height:17px;flex:none;accent-color:var(--navy);cursor:pointer;}
   .item .body{flex:1;}
@@ -135,6 +138,7 @@ const PHASES = [
 
 const KEY = "westside_roadmap_v1";
 let checks = {};
+let phaseCountEls = [];
 try { checks = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ checks = {}; }
 
 function keyFor(p, t){ return p + "::" + t; }
@@ -142,12 +146,16 @@ function keyFor(p, t){ return p + "::" + t; }
 function render(){
   const root = document.getElementById("roadmap");
   root.textContent = "";
+  phaseCountEls = [];
   PHASES.forEach(ph => {
     const sec = document.createElement("div"); sec.className = "phase";
     const h = document.createElement("h2");
     const nm = document.createElement("span"); nm.textContent = ph.name;
+    const right = document.createElement("span"); right.className = "phase-right";
+    const pc = document.createElement("span"); pc.className = "phase-count"; phaseCountEls.push(pc);
     const tg = document.createElement("span"); tg.className = "tag " + ph.tag; tg.textContent = ph.tagText;
-    h.append(nm, tg); sec.append(h);
+    right.append(pc, tg);
+    h.append(nm, right); sec.append(h);
     ph.items.forEach(([t, d, status]) => {
       const k = keyFor(ph.name, t);
       const done = status === "done";
@@ -177,10 +185,18 @@ function render(){
 
 function updateProgress(){
   let total = 0, done = 0;
-  PHASES.forEach(ph => ph.items.forEach(([t, d, status]) => {
-    total++;
-    if (status === "done" || checks[keyFor(ph.name, t)]) done++;
-  }));
+  PHASES.forEach((ph, i) => {
+    let pTotal = 0, pDone = 0;
+    ph.items.forEach(([t, d, status]) => {
+      pTotal++; total++;
+      if (status === "done" || checks[keyFor(ph.name, t)]) { pDone++; done++; }
+    });
+    const el = phaseCountEls[i];
+    if (el) {
+      if (pDone === pTotal) { el.textContent = "All done ✓"; el.classList.add("all-done"); }
+      else { el.textContent = pDone + "/" + pTotal + " · " + (pTotal - pDone) + " left"; el.classList.remove("all-done"); }
+    }
+  });
   document.getElementById("progFill").style.width = total ? (done/total*100)+"%" : "0";
   document.getElementById("progLabel").textContent = done + " of " + total + " done";
 }
