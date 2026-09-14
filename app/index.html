@@ -91,6 +91,15 @@
   .ann .ab{margin:6px 0 0;white-space:pre-wrap;font-size:14.5px;}
   .ann .am{font-size:12px;color:var(--ink-soft);margin-top:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;}
   .ann .del{font-size:12px;padding:4px 10px;}
+  .pr{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+  .pr.answered{border-color:var(--gold-soft);}
+  .pr .pb{font-size:14.5px;white-space:pre-wrap;}
+  .pr .pm{font-size:12px;color:var(--ink-soft);margin-top:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;}
+  .pr .acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .pray-btn{font-size:12.5px;padding:5px 12px;border-radius:20px;border:1px solid var(--line);background:var(--cream);color:var(--ink);cursor:pointer;}
+  .pray-btn.on{background:#f7e9ce;border-color:var(--gold);color:#7a5a16;font-weight:600;}
+  .ansbadge{font-size:10.5px;font-weight:700;text-transform:uppercase;background:#e2f0e7;color:#2f7a52;padding:2px 8px;border-radius:20px;}
+  .mini{font-size:12px;padding:4px 9px;}
   .mrow{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:11px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
   .mrow .who{flex:1;min-width:150px;}
   .mrow .who .nm{font-weight:600;font-size:14.5px;}
@@ -166,6 +175,16 @@
         <div id="annNote"></div>
       </div>
       <div id="annList"></div>
+    </section>
+
+    <section id="prayerSection" hidden style="margin-top:8px;">
+      <div class="section-head"><h2>Prayer wall</h2></div>
+      <div id="prayerCompose" class="card" hidden style="margin-bottom:14px;">
+        <div class="field"><label for="prBody">Request</label><textarea id="prBody" rows="3" placeholder="Share a prayer request…"></textarea></div>
+        <button class="btn" id="prPostBtn">Post request</button>
+        <div id="prNote"></div>
+      </div>
+      <div id="prayerList"></div>
     </section>
 
     <div class="section-head">
@@ -622,6 +641,55 @@ $("annPostBtn").addEventListener("click", async ()=>{
   $("annTitle").value=''; $("annBody").value=''; note($("annNote"),"Posted.","ok"); loadAnnouncements();
 });
 
+// ---- Prayer wall ----
+let prWrite=false, prFull=false;
+async function loadPrayers(){
+  const [{data:reqs,error:e1},{data:fol},{data:{user}}] = await Promise.all([
+    sb.from('prayer_requests').select('*').order('answered',{ascending:true}).order('created_at',{ascending:false}),
+    sb.from('prayer_follows').select('request_id,user_id'),
+    sb.auth.getUser()
+  ]);
+  const list=$('prayerList'); list.innerHTML='';
+  if(e1){ return; }
+  const counts={}, mine=new Set();
+  (fol||[]).forEach(f=>{ counts[f.request_id]=(counts[f.request_id]||0)+1; if(user&&f.user_id===user.id) mine.add(f.request_id); });
+  const rows=reqs||[];
+  if(!rows.length){ const em=document.createElement('div'); em.className='muted'; em.style.cssText='font-size:14px;padding:4px 2px;'; em.textContent='No prayer requests yet.'; list.append(em); return; }
+  rows.forEach(p=>{
+    const c=document.createElement('div'); c.className='pr'+(p.answered?' answered':'');
+    const bd=document.createElement('div'); bd.className='pb'; bd.textContent=p.body; c.append(bd);
+    const m=document.createElement('div'); m.className='pm';
+    const who=document.createElement('span'); who.textContent=(p.requester_name||'Someone')+' · '+new Date(p.created_at).toLocaleDateString(); m.append(who);
+    const acts=document.createElement('div'); acts.className='acts';
+    if(p.answered){ const b=document.createElement('span'); b.className='ansbadge'; b.textContent='Answered'; acts.append(b); }
+    const pray=document.createElement('button'); pray.className='pray-btn'+(mine.has(p.id)?' on':''); pray.textContent='🙏 '+(counts[p.id]||0);
+    pray.onclick=async()=>{
+      if(!user) return;
+      if(mine.has(p.id)){ await sb.from('prayer_follows').delete().eq('request_id',p.id).eq('user_id',user.id); }
+      else { await sb.from('prayer_follows').insert({ request_id:p.id, user_id:user.id }); }
+      loadPrayers();
+    };
+    acts.append(pray);
+    const owner = user && p.requester_id===user.id;
+    if(prFull || (prWrite && owner)){
+      const ans=document.createElement('button'); ans.className='btn btn-ghost mini'; ans.textContent=p.answered?'Reopen':'Mark answered';
+      ans.onclick=async()=>{ await sb.from('prayer_requests').update({ answered: !p.answered }).eq('id',p.id); loadPrayers(); };
+      const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Delete';
+      del.onclick=async()=>{ if(!confirm('Delete this request?'))return; await sb.from('prayer_requests').delete().eq('id',p.id); loadPrayers(); };
+      acts.append(ans,del);
+    }
+    m.append(acts); c.append(m); list.append(c);
+  });
+}
+$("prPostBtn").addEventListener("click", async ()=>{
+  const body=$("prBody").value.trim(); if(!body){ note($("prNote"),"Write your request.","err"); return; }
+  const { data:{ user } } = await sb.auth.getUser();
+  const name=($("pName").value.trim())||(user&&user.email)||'Member';
+  const { error }=await sb.from('prayer_requests').insert({ body, requester_id:user.id, requester_name:name });
+  if(error){ note($("prNote"),error.message,"err"); return; }
+  $("prBody").value=''; note($("prNote"),"Posted.","ok"); loadPrayers();
+});
+
 // ---- Boot: decide which view to show ----
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
@@ -652,11 +720,16 @@ async function boot(){
     canWriteAnn = annLevel >= 2; canFullAnn = annLevel >= 3;
     $("annSection").hidden = !(approved && annLevel >= 1);
     $("annCompose").hidden = !canWriteAnn;
+    const prLvl = superAdmin ? 3 : (myPerms['prayer_wall']||0);
+    prWrite = prLvl >= 2; prFull = prLvl >= 3;
+    $("prayerSection").hidden = !(approved && prLvl >= 1);
+    $("prayerCompose").hidden = !prWrite;
     const incomplete = !me || !((me.full_name||"").trim());
     $("onboardNotice").hidden = !incomplete;
     if(incomplete){ setTimeout(()=>{ try{ $("pName").focus(); }catch(e){} }, 350); }
     if(approved) await loadDirectory();
     if(approved && (superAdmin || (myPerms['announcements']||0) >= 1)) await loadAnnouncements();
+    if(approved && (superAdmin || (myPerms['prayer_wall']||0) >= 1)) await loadPrayers();
     if(canApprove) await loadPending();
     if(superAdmin){ await loadRolesList(); await loadMembersAdmin(); await loadRolesEditor(); }
   } else {
