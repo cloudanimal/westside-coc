@@ -84,6 +84,20 @@
   .pending-actions .btn{padding:7px 14px;font-size:13px;}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:100;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .mrow{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:11px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+  .mrow .who{flex:1;min-width:150px;}
+  .mrow .who .nm{font-weight:600;font-size:14.5px;}
+  .mrow .who .em{font-size:12.5px;color:var(--ink-soft);}
+  .mrow select,.permrow select{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--cream);color:var(--ink);}
+  .mrow .st{font-size:11px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:20px;}
+  .st.approved{background:#e2f0e7;color:#2f7a52;} .st.pending{background:#fdf1d8;color:#9a6b16;} .st.denied{background:#eceee9;color:#6e6a5c;}
+  .superlbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-soft);white-space:nowrap;}
+  .superlbl input{width:15px;height:15px;accent-color:var(--navy);}
+  .roleblk{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+  .roleblk .rh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+  .roleblk .rn{font-weight:700;font-size:15px;}
+  .permgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:7px 16px;}
+  .permrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;}
   [hidden]{display:none!important;}
 </style>
 </head>
@@ -162,16 +176,34 @@
 
     <section id="adminPanel" hidden>
       <div class="section-head"><h2>Admin</h2></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px;">
+      <div id="exportTools" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px;">
         <button class="btn btn-ghost" id="exportCsv" style="font-size:13px;padding:8px 14px;">Export members (CSV)</button>
         <button class="btn btn-ghost" id="backupJson" style="font-size:13px;padding:8px 14px;">Download backup (JSON)</button>
       </div>
-      <p class="muted" style="font-size:12px;margin:0 0 16px;">Backups include every member (pending and approved). Keep them somewhere safe as your off-site copy.</p>
-      <div class="section-head">
-        <h2 style="font-size:17px;">Pending approvals</h2>
-        <span class="muted" id="pendingCount"></span>
+      <p class="muted" id="backupNote" style="font-size:12px;margin:0 0 16px;">Backups include every member (pending and approved). Keep them somewhere safe as your off-site copy.</p>
+
+      <div id="pendingBlock">
+        <div class="section-head">
+          <h2 style="font-size:17px;">Pending approvals</h2>
+          <span class="muted" id="pendingCount"></span>
+        </div>
+        <div class="dir-grid" id="pendingList"></div>
       </div>
-      <div class="dir-grid" id="pendingList"></div>
+
+      <div id="membersAdmin" hidden style="margin-top:24px;">
+        <div class="section-head"><h2 style="font-size:17px;">Members &amp; roles</h2></div>
+        <div id="membersList"></div>
+      </div>
+
+      <div id="rolesAdmin" hidden style="margin-top:24px;">
+        <div class="section-head"><h2 style="font-size:17px;">Roles &amp; permissions</h2></div>
+        <p class="muted" style="font-size:12px;margin:0 0 10px;">Set what each role can do in each section: None, Read, Write, or Full control. Changes save as you go.</p>
+        <div id="rolesList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+          <input id="newRoleName" type="text" placeholder="New role name" style="flex:1;min-width:180px;font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--cream);color:var(--ink);" />
+          <button class="btn btn-ghost" id="addRoleBtn" style="font-size:13px;padding:9px 14px;">Add role</button>
+        </div>
+      </div>
     </section>
 
     <div id="dirSection">
@@ -457,6 +489,85 @@ $("backupJson").addEventListener("click", async ()=>{
   toast("Backup downloaded ("+rows.length+")");
 });
 
+// ---- RBAC: roles & members management (super-admin) ----
+const SECTIONS = [
+  ['directory','Directory'],['calendar','Calendar / Events'],['announcements','Announcements'],
+  ['prayer_wall','Prayer wall'],['approvals','Member approvals'],['attendance','Attendance'],
+  ['care','Care / Visitation'],['files','Files'],['giving','Giving']
+];
+const LEVELS = [[0,'None'],[1,'Read'],[2,'Write'],[3,'Full control']];
+let superAdmin=false, myPerms={}, allRoles=[];
+
+async function loadRolesList(){
+  const { data } = await sb.from('roles').select('id,name,is_system').order('name');
+  allRoles = data||[];
+}
+
+async function loadMembersAdmin(){
+  const { data, error } = await sb.from('profiles').select('id,full_name,email,status,role_id,is_super_admin').order('full_name');
+  const list=$('membersList'); list.innerHTML='';
+  if(error){ toast(error.message); return; }
+  const rows=data||[]; const superCount=rows.filter(m=>m.is_super_admin).length;
+  rows.forEach(m=>{
+    const row=document.createElement('div'); row.className='mrow';
+    const who=document.createElement('div'); who.className='who';
+    const nm=document.createElement('div'); nm.className='nm'; nm.textContent=m.full_name||'(no name)';
+    const em=document.createElement('div'); em.className='em'; em.textContent=m.email||'';
+    who.append(nm,em);
+    const st=document.createElement('span'); st.className='st '+(m.status||'pending'); st.textContent=m.status||'pending';
+    const sel=document.createElement('select');
+    const none=document.createElement('option'); none.value=''; none.textContent='— no role —'; sel.append(none);
+    allRoles.forEach(r=>{ const o=document.createElement('option'); o.value=r.id; o.textContent=r.name; if(r.id===m.role_id)o.selected=true; sel.append(o); });
+    sel.onchange=async()=>{ const { error }=await sb.from('profiles').update({ role_id: sel.value||null }).eq('id',m.id); toast(error?error.message:'Role updated'); };
+    const superWrap=document.createElement('label'); superWrap.className='superlbl';
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!m.is_super_admin;
+    cb.onchange=async()=>{
+      if(!cb.checked && m.is_super_admin && superCount<=1){ cb.checked=true; toast("Can't remove the last super-admin"); return; }
+      const { error }=await sb.from('profiles').update({ is_super_admin: cb.checked }).eq('id',m.id);
+      if(error){ cb.checked=!cb.checked; toast(error.message); } else { toast('Super-admin '+(cb.checked?'granted':'removed')); loadMembersAdmin(); }
+    };
+    superWrap.append(cb, document.createTextNode('Super-admin'));
+    row.append(who, st, sel, superWrap);
+    list.append(row);
+  });
+}
+
+async function loadRolesEditor(){
+  const { data:perms } = await sb.from('role_permissions').select('role_id,section,level');
+  const map={}; (perms||[]).forEach(p=>{ (map[p.role_id]=map[p.role_id]||{})[p.section]=p.level; });
+  const list=$('rolesList'); list.innerHTML='';
+  allRoles.forEach(r=>{
+    const blk=document.createElement('div'); blk.className='roleblk';
+    const rh=document.createElement('div'); rh.className='rh';
+    const rn=document.createElement('div'); rn.className='rn'; rn.textContent=r.name+(r.is_system?'  ·  default':'');
+    rh.append(rn);
+    if(!r.is_system){
+      const del=document.createElement('button'); del.className='btn btn-ghost'; del.style.cssText='font-size:12px;padding:5px 10px;'; del.textContent='Delete';
+      del.onclick=async()=>{ if(!confirm('Delete role "'+r.name+'"? Members with it will be left with no role.')) return; const { error }=await sb.from('roles').delete().eq('id',r.id); if(error){toast(error.message);} else { toast('Role deleted'); await loadRolesList(); loadRolesEditor(); loadMembersAdmin(); } };
+      rh.append(del);
+    }
+    blk.append(rh);
+    const grid=document.createElement('div'); grid.className='permgrid';
+    SECTIONS.forEach(([key,label])=>{
+      const pr=document.createElement('div'); pr.className='permrow';
+      const lb=document.createElement('span'); lb.textContent=label;
+      const sel=document.createElement('select');
+      const cur=(map[r.id]&&map[r.id][key])||0;
+      LEVELS.forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; if(cur===v)o.selected=true; sel.append(o); });
+      sel.onchange=async()=>{ const { error }=await sb.from('role_permissions').upsert({ role_id:r.id, section:key, level:parseInt(sel.value,10) }, { onConflict:'role_id,section' }); toast(error?error.message:'Saved'); };
+      pr.append(lb, sel); grid.append(pr);
+    });
+    blk.append(grid); list.append(blk);
+  });
+}
+
+$("addRoleBtn").addEventListener("click", async ()=>{
+  const name=$("newRoleName").value.trim(); if(!name) return;
+  const { error }=await sb.from('roles').insert({ name });
+  if(error){ toast(error.message); return; }
+  $("newRoleName").value=''; toast('Role "'+name+'" added'); await loadRolesList(); loadRolesEditor(); loadMembersAdmin();
+});
+
 // ---- Boot: decide which view to show ----
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
@@ -466,15 +577,28 @@ async function boot(){
     show("appView");
     const me = await loadProfile(session.user.id);
     const approved = !!me && me.status === "approved";
-    const admin = !!me && me.role === "admin";
+    superAdmin = !!me && me.is_super_admin === true;
+    myPerms = {};
+    if(me && me.role_id){
+      const { data:mp } = await sb.from('role_permissions').select('section,level').eq('role_id', me.role_id);
+      (mp||[]).forEach(x=>myPerms[x.section]=x.level);
+    }
+    const canApprove = superAdmin || (myPerms['approvals']||0) >= 3;
+    const showAdmin = superAdmin || canApprove;
     $("pendingNotice").hidden = approved;
     $("dirSection").hidden = !approved;
-    $("adminPanel").hidden = !admin;
+    $("adminPanel").hidden = !showAdmin;
+    $("exportTools").hidden = !superAdmin;
+    $("backupNote").hidden = !superAdmin;
+    $("pendingBlock").hidden = !canApprove;
+    $("membersAdmin").hidden = !superAdmin;
+    $("rolesAdmin").hidden = !superAdmin;
     const incomplete = !me || !((me.full_name||"").trim());
     $("onboardNotice").hidden = !incomplete;
     if(incomplete){ setTimeout(()=>{ try{ $("pName").focus(); }catch(e){} }, 350); }
     if(approved) await loadDirectory();
-    if(admin) await loadPending();
+    if(canApprove) await loadPending();
+    if(superAdmin){ await loadRolesList(); await loadMembersAdmin(); await loadRolesEditor(); }
   } else {
     show("loginView");
   }
