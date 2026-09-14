@@ -20,7 +20,7 @@ jobs:
           KEY="sb_publishable_H7XQ6LPVRSQjC2I36iwbMA_TTrLr2VT"
 
           echo "Auth health check:"
-          curl -sS -o /dev/null -w "  HTTP %{http_code}\n" "$URL/auth/v1/health"
+          curl -sS -o /dev/null -w "  HTTP %{http_code}\n" "$URL/auth/v1/health" -H "apikey: $KEY"
 
           echo "Database read (this is what keeps Postgres active):"
           curl -sS -o /dev/null -w "  HTTP %{http_code}\n" \
