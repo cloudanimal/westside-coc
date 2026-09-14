@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f3a4d'/%3E%3Cpath d='M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z' fill='%23d8b25e'/%3E%3C/svg%3E" />
 <style>
   :root{
@@ -72,6 +73,11 @@
   .grouptoggle input{width:16px;height:16px;accent-color:var(--navy);}
   .fam-group-head{grid-column:1/-1;font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--gold);text-transform:uppercase;margin:16px 0 0;}
   .dir-empty{grid-column:1/-1;color:var(--ink-soft);font-size:14px;padding:14px 2px;}
+  .person .addr{font-size:13px;margin-top:4px;}
+  .person .addr a{color:var(--brand-text);text-decoration:none;}
+  .person .addr a:hover{text-decoration:underline;}
+  #memberMap{height:360px;border-radius:12px;border:1px solid var(--line);overflow:hidden;}
+  .leaflet-container{font-family:inherit;}
   .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 4px;}
   .section-head h2{font-size:18px;margin:0;}
   .pending-actions{display:flex;gap:8px;margin-top:10px;}
@@ -177,6 +183,12 @@
         <label class="grouptoggle"><input type="checkbox" id="dirGroup" /> Group by family</label>
       </div>
       <div class="dir-grid" id="dirGrid"></div>
+
+      <div id="mapSection" style="margin-top:26px;">
+        <div class="section-head"><h2>Member map</h2></div>
+        <p class="muted" style="font-size:12.5px;margin:0 0 8px;">Members who add an address appear here. Visible only to signed-in members.</p>
+        <div id="memberMap"></div>
+      </div>
     </div>
   </section>
 
@@ -187,6 +199,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 // ---- Your Supabase project ----
@@ -207,6 +220,39 @@ function setAvatar(img, url, name){ img.src = url || initialsAvatar(name); }
 function downloadBlob(filename, text, type){ const b=new Blob([text],{type}); const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download=filename; document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(u); }
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function csvCell(v){ v=(v==null?"":String(v)); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+function mapsUrl(address){ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(address); }
+async function geocode(address){
+  try{
+    const url="https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(address);
+    const r=await fetch(url,{headers:{Accept:"application/json"}});
+    const j=await r.json();
+    if(j&&j[0]) return { lat:parseFloat(j[0].lat), lng:parseFloat(j[0].lon) };
+  }catch(e){}
+  return null;
+}
+let map=null, markerLayer=null;
+function renderMap(people){
+  const el=$("memberMap");
+  if(!el || typeof L==="undefined") return;
+  if(!map){
+    map=L.map(el,{scrollWheelZoom:false}).setView([29.6465,-82.6068], 11);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19, attribution:"&copy; OpenStreetMap"}).addTo(map);
+    markerLayer=L.layerGroup().addTo(map);
+  }
+  markerLayer.clearLayers();
+  const esc=s=>String(s||"").replace(/</g,"&lt;");
+  const pts=[];
+  (people||[]).forEach(p=>{
+    if(typeof p.lat==="number" && typeof p.lng==="number"){
+      const m=L.circleMarker([p.lat,p.lng],{radius:8,color:"#1f3a4d",weight:2,fillColor:"#c1922f",fillOpacity:.9});
+      let html="<strong>"+esc(p.full_name||"Member")+"</strong>";
+      if(p.family) html+="<br>"+esc(p.family);
+      if(p.address) html+="<br><a href='"+mapsUrl(p.address)+"' target='_blank' rel='noopener'>Directions</a>";
+      m.bindPopup(html); m.addTo(markerLayer); pts.push([p.lat,p.lng]);
+    }
+  });
+  setTimeout(()=>{ try{ map.invalidateSize(); if(pts.length){ map.fitBounds(pts,{padding:[40,40],maxZoom:14}); } }catch(e){} }, 60);
+}
 
 // ---- Auth: send magic link ----
 $("sendLinkBtn").addEventListener("click", async ()=>{
@@ -275,7 +321,14 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
   }).eq("id", user.id);
   btn.disabled=false; btn.textContent="Save my entry";
   if(error){ note($("profileNote"), error.message, "err"); }
-  else { note($("profileNote"), "Saved.", "ok"); loadDirectory(); $("onboardNotice").hidden = !!$("pName").value.trim(); }
+  else {
+    note($("profileNote"), "Saved.", "ok");
+    $("onboardNotice").hidden = !!$("pName").value.trim();
+    const addr=$("pAddress").value.trim();
+    if(addr){ const g=await geocode(addr); await sb.from("profiles").update({ lat:g?g.lat:null, lng:g?g.lng:null }).eq("id", user.id); }
+    else { await sb.from("profiles").update({ lat:null, lng:null }).eq("id", user.id); }
+    loadDirectory();
+  }
 });
 
 // ---- Member: download my data / delete my account ----
@@ -310,6 +363,11 @@ function personCard(p){
   if(p.phone && p.email) c.append(document.createTextNode("  •  "));
   if(p.email){ const a=document.createElement("a"); a.href="mailto:"+p.email; a.textContent=p.email; c.append(a); }
   card.append(c);
+  if(p.address){
+    const ad=document.createElement("div"); ad.className="addr";
+    const link=document.createElement("a"); link.href=mapsUrl(p.address); link.target="_blank"; link.rel="noopener"; link.textContent=p.address;
+    ad.append(link); card.append(ad);
+  }
   return card;
 }
 
@@ -339,10 +397,11 @@ function renderDirectory(){
 }
 
 async function loadDirectory(){
-  const { data, error } = await sb.from("profiles").select("full_name,family,phone,email,photo_url").eq("status","approved").order("full_name");
+  const { data, error } = await sb.from("profiles").select("full_name,family,phone,email,photo_url,address,lat,lng").eq("status","approved").order("full_name");
   if(error){ note($("profileNote"), error.message, "err"); return; }
   dirPeople=(data||[]).filter(p=>p.full_name||p.email);
   renderDirectory();
+  renderMap(dirPeople);
 }
 
 $("dirSearch").addEventListener("input", renderDirectory);
