@@ -66,6 +66,12 @@
   .avatar-sm{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--cream);border:1px solid var(--line);flex:none;}
   .avatar-row{display:flex;gap:14px;align-items:center;margin-bottom:16px;}
   .avatar-preview{width:66px;height:66px;border-radius:50%;object-fit:cover;background:var(--cream);border:1px solid var(--line);flex:none;}
+  .dir-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:6px 0 4px;}
+  .dir-controls input[type="search"]{flex:1;min-width:200px;font-family:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--cream);color:var(--ink);}
+  .grouptoggle{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink-soft);white-space:nowrap;cursor:pointer;}
+  .grouptoggle input{width:16px;height:16px;accent-color:var(--navy);}
+  .fam-group-head{grid-column:1/-1;font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--gold);text-transform:uppercase;margin:16px 0 0;}
+  .dir-empty{grid-column:1/-1;color:var(--ink-soft);font-size:14px;padding:14px 2px;}
   .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 4px;}
   .section-head h2{font-size:18px;margin:0;}
   .pending-actions{display:flex;gap:8px;margin-top:10px;}
@@ -150,6 +156,10 @@
       <div class="section-head">
         <h2>Everyone</h2>
         <span class="muted" id="dirCount"></span>
+      </div>
+      <div class="dir-controls">
+        <input id="dirSearch" type="search" placeholder="Search by name, family, phone, email…" />
+        <label class="grouptoggle"><input type="checkbox" id="dirGroup" /> Group by family</label>
       </div>
       <div class="dir-grid" id="dirGrid"></div>
     </div>
@@ -250,29 +260,59 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
   else { note($("profileNote"), "Saved.", "ok"); loadDirectory(); }
 });
 
+let dirPeople = [];
+
+function personCard(p){
+  const card=document.createElement("div"); card.className="person";
+  const top=document.createElement("div"); top.className="pcard-top";
+  const av=document.createElement("img"); av.className="avatar-sm"; av.alt=""; setAvatar(av, p.photo_url, p.full_name||p.email);
+  const info=document.createElement("div");
+  const nm=document.createElement("div"); nm.className="nm"; nm.textContent=p.full_name||"(name not set)";
+  info.append(nm);
+  if(p.family){ const f=document.createElement("div"); f.className="fam"; f.textContent=p.family; info.append(f); }
+  top.append(av, info); card.append(top);
+  const c=document.createElement("div"); c.className="contact";
+  if(p.phone){ const a=document.createElement("a"); a.href="tel:"+p.phone; a.textContent=p.phone; c.append(a); }
+  if(p.phone && p.email) c.append(document.createTextNode("  •  "));
+  if(p.email){ const a=document.createElement("a"); a.href="mailto:"+p.email; a.textContent=p.email; c.append(a); }
+  card.append(c);
+  return card;
+}
+
+function renderDirectory(){
+  const grid=$("dirGrid"); grid.innerHTML="";
+  const q=($("dirSearch").value||"").trim().toLowerCase();
+  const group=$("dirGroup").checked;
+  const people=dirPeople.filter(p=> !q || [p.full_name,p.family,p.phone,p.email].some(v=>(v||"").toLowerCase().includes(q)));
+  $("dirCount").textContent = people.length + (people.length===1?" member":" members");
+  if(!people.length){
+    const e=document.createElement("div"); e.className="dir-empty";
+    e.textContent = q ? "No one matches your search." : "No members yet.";
+    grid.append(e); return;
+  }
+  if(group){
+    const groups={};
+    people.forEach(p=>{ const key=(p.family||"").trim()||"—"; (groups[key]=groups[key]||[]).push(p); });
+    Object.keys(groups).sort((a,b)=> a==="—"?1 : b==="—"?-1 : a.localeCompare(b)).forEach(fam=>{
+      const h=document.createElement("div"); h.className="fam-group-head";
+      h.textContent = fam==="—" ? "No household set" : fam;
+      grid.append(h);
+      groups[fam].forEach(p=>grid.append(personCard(p)));
+    });
+  } else {
+    people.forEach(p=>grid.append(personCard(p)));
+  }
+}
+
 async function loadDirectory(){
   const { data, error } = await sb.from("profiles").select("full_name,family,phone,email,photo_url").eq("status","approved").order("full_name");
-  const grid=$("dirGrid"); grid.innerHTML="";
   if(error){ note($("profileNote"), error.message, "err"); return; }
-  const people=(data||[]).filter(p=>p.full_name||p.email);
-  $("dirCount").textContent = people.length + (people.length===1?" member":" members");
-  people.forEach(p=>{
-    const card=document.createElement("div"); card.className="person";
-    const top=document.createElement("div"); top.className="pcard-top";
-    const av=document.createElement("img"); av.className="avatar-sm"; av.alt=""; setAvatar(av, p.photo_url, p.full_name||p.email);
-    const info=document.createElement("div");
-    const nm=document.createElement("div"); nm.className="nm"; nm.textContent=p.full_name||"(name not set)";
-    info.append(nm);
-    if(p.family){ const f=document.createElement("div"); f.className="fam"; f.textContent=p.family; info.append(f); }
-    top.append(av, info); card.append(top);
-    const c=document.createElement("div"); c.className="contact";
-    if(p.phone){ const a=document.createElement("a"); a.href="tel:"+p.phone; a.textContent=p.phone; c.append(a); }
-    if(p.phone && p.email) c.append(document.createTextNode("  •  "));
-    if(p.email){ const a=document.createElement("a"); a.href="mailto:"+p.email; a.textContent=p.email; c.append(a); }
-    card.append(c);
-    grid.append(card);
-  });
+  dirPeople=(data||[]).filter(p=>p.full_name||p.email);
+  renderDirectory();
 }
+
+$("dirSearch").addEventListener("input", renderDirectory);
+$("dirGroup").addEventListener("change", renderDirectory);
 
 // ---- Admin: pending approvals ----
 async function loadPending(){
