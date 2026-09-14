@@ -98,7 +98,7 @@ const PHASES = [
     ["Member map", "Leaflet + OpenStreetMap map of members who add an address (geocoded on save). Pins show name, household, and a Directions link. Members-only.", "done"],
   ]},
   { name:"Communication", tag:"next", tagText:"Phase 2", items:[
-    ["Announcements / bulletin board", "Admins post; members read.", ""],
+    ["Announcements / bulletin board", "Post/read/delete gated by the RBAC 'announcements' permission: Read sees them, Write can post + delete own, Full control deletes any. First feature wired to can().", "done"],
     ["Prayer wall", "Post requests, follow them, mark answered.", ""],
     ["Text / email blasts", "Admin to members — where Flocknote/Twilio plug in.", ""],
     ["Notifications", "Email or push when something is posted.", ""],
