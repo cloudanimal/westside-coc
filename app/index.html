@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  (function () { try { var t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+</script>
+<title>Members — Westside church of Christ</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f3a4d'/%3E%3Cpath d='M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z' fill='%23d8b25e'/%3E%3C/svg%3E" />
+<style>
+  :root{
+    --cream:#faf7f1; --cream-2:#f2ece0; --ink:#23303b; --ink-soft:#566773;
+    --navy:#1f3a4d; --navy-2:#17303f; --gold:#c1922f; --gold-soft:#d8b25e;
+    --line:#e6ddcd; --white:#fff; --on-brand:#fff; --brand-text:var(--navy);
+    --radius:14px; --shadow:0 18px 50px -22px rgba(31,58,77,.35);
+    --sans:"Inter",Arial,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --ink-soft:#a6b6c1;
+    --line:#2b3c48; --brand-text:#9fc4de; --on-brand:#10202b; --shadow:0 18px 50px -22px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="dark"]{
+    --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --ink-soft:#a6b6c1;
+    --line:#2b3c48; --brand-text:#9fc4de; --on-brand:#10202b; --shadow:0 18px 50px -22px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  .site-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:12px clamp(16px,5vw,40px);background:var(--cream);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--brand-text);text-decoration:none;}
+  .brand svg{width:24px;height:24px;fill:var(--gold);}
+  .brand em{font-style:normal;font-weight:500;color:var(--ink-soft);}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .header-right a.home,.linkbtn{font-size:13.5px;color:var(--ink-soft);text-decoration:none;padding:8px 10px;border-radius:8px;background:none;border:0;cursor:pointer;font-family:inherit;}
+  .header-right a.home:hover,.linkbtn:hover{color:var(--brand-text);}
+  .wrap{max-width:900px;margin:0 auto;padding:34px 20px 90px;}
+  h1{font-size:clamp(24px,4vw,32px);margin:0 0 6px;}
+  .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 10px;}
+  .muted{color:var(--ink-soft);}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+  .field label{font-size:13px;font-weight:600;}
+  input{font-family:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--cream);color:var(--ink);width:100%;}
+  input:focus{outline:2px solid var(--gold-soft);border-color:var(--gold);}
+  .btn{font-family:inherit;font-size:15px;font-weight:600;padding:11px 18px;border-radius:10px;cursor:pointer;border:1px solid var(--navy);background:var(--navy);color:var(--on-brand);}
+  .btn:hover{background:var(--navy-2);}
+  .btn:disabled{opacity:.6;cursor:default;}
+  .btn-ghost{background:var(--white);color:var(--ink);border-color:var(--line);}
+  .note{font-size:13px;padding:10px 12px;border-radius:9px;margin-top:12px;}
+  .note.ok{background:#e2f0e7;color:#2f7a52;border:1px solid #2f7a52;}
+  .note.err{background:#f6e0dd;color:#a1442f;border:1px solid #a1442f;}
+  .dir-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px;}
+  @media(min-width:620px){.dir-grid{grid-template-columns:1fr 1fr;}}
+  .person{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .person .nm{font-weight:700;font-size:16px;}
+  .person .fam{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:1px;}
+  .person .contact{font-size:14px;color:var(--ink-soft);margin-top:6px;}
+  .person .contact a{text-decoration:underline;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 4px;}
+  .section-head h2{font-size:18px;margin:0;}
+  [hidden]{display:none!important;}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 5h2v6h6v2h-6v14h-2V13H9v-2h6z"/></svg><span>Westside <em>church of Christ</em></span></a>
+  <div class="header-right">
+    <a class="home" href="/">&larr; Home</a>
+    <button class="linkbtn" id="signOutBtn" hidden>Sign out</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- LOGGED OUT: sign in -->
+  <section id="loginView" hidden>
+    <p class="eyebrow">Members</p>
+    <h1>Sign in</h1>
+    <p class="muted">Enter your email and we'll send you a secure sign-in link. No password needed.</p>
+    <div class="card" style="margin-top:18px;max-width:440px;">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="you@example.com" />
+      </div>
+      <button class="btn" id="sendLinkBtn" style="width:100%;">Email me a sign-in link</button>
+      <div id="loginNote"></div>
+    </div>
+  </section>
+
+  <!-- LOGGED IN: directory -->
+  <section id="appView" hidden>
+    <p class="eyebrow">Members</p>
+    <h1>Church Directory</h1>
+    <p class="muted">Signed in as <strong id="whoami"></strong>.</p>
+
+    <div class="section-head">
+      <h2>Your entry</h2>
+    </div>
+    <div class="card">
+      <div class="field"><label for="pName">Name</label><input id="pName" type="text" placeholder="First and last name" /></div>
+      <div class="field"><label for="pFamily">Family / household</label><input id="pFamily" type="text" placeholder="e.g. The Cook family" /></div>
+      <div class="field"><label for="pPhone">Phone</label><input id="pPhone" type="tel" placeholder="Optional" /></div>
+      <button class="btn" id="saveProfileBtn">Save my entry</button>
+      <div id="profileNote"></div>
+    </div>
+
+    <div class="section-head">
+      <h2>Everyone</h2>
+      <span class="muted" id="dirCount"></span>
+    </div>
+    <div class="dir-grid" id="dirGrid"></div>
+  </section>
+
+  <section id="bootView">
+    <p class="muted">Loading…</p>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+// ---- Your Supabase project ----
+const SUPA_URL = "https://hpdikwatyhnctfhrrslh.supabase.co";
+const SUPA_KEY = "sb_publishable_H7XQ6LPVRSQjC2I36iwbMA_TTrLr2VT";
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+const $ = id => document.getElementById(id);
+function show(view){ ["bootView","loginView","appView"].forEach(v=>$(v).hidden = (v!==view)); }
+function note(el, msg, kind){ el.innerHTML=""; if(!msg) return; const d=document.createElement("div"); d.className="note "+kind; d.textContent=msg; el.append(d); }
+
+// ---- Auth: send magic link ----
+$("sendLinkBtn").addEventListener("click", async ()=>{
+  const email = $("email").value.trim();
+  if(!email){ note($("loginNote"),"Please enter your email.","err"); return; }
+  const btn=$("sendLinkBtn"); btn.disabled=true; btn.textContent="Sending…";
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href.split('#')[0] }
+  });
+  btn.disabled=false; btn.textContent="Email me a sign-in link";
+  if(error){ note($("loginNote"), error.message, "err"); }
+  else { note($("loginNote"), "Check your email for the sign-in link.", "ok"); }
+});
+
+$("signOutBtn").addEventListener("click", async ()=>{ await sb.auth.signOut(); location.reload(); });
+
+// ---- Directory ----
+async function loadProfile(userId){
+  const { data } = await sb.from("profiles").select("*").eq("id", userId).single();
+  if(data){ $("pName").value=data.full_name||""; $("pFamily").value=data.family||""; $("pPhone").value=data.phone||""; }
+}
+$("saveProfileBtn").addEventListener("click", async ()=>{
+  const { data:{ user } } = await sb.auth.getUser();
+  if(!user) return;
+  const btn=$("saveProfileBtn"); btn.disabled=true; btn.textContent="Saving…";
+  const { error } = await sb.from("profiles").update({
+    full_name: $("pName").value.trim(),
+    family: $("pFamily").value.trim(),
+    phone: $("pPhone").value.trim(),
+  }).eq("id", user.id);
+  btn.disabled=false; btn.textContent="Save my entry";
+  if(error){ note($("profileNote"), error.message, "err"); }
+  else { note($("profileNote"), "Saved.", "ok"); loadDirectory(); }
+});
+
+async function loadDirectory(){
+  const { data, error } = await sb.from("profiles").select("full_name,family,phone,email").order("full_name");
+  const grid=$("dirGrid"); grid.innerHTML="";
+  if(error){ note($("profileNote"), error.message, "err"); return; }
+  const people=(data||[]).filter(p=>p.full_name||p.email);
+  $("dirCount").textContent = people.length + (people.length===1?" member":" members");
+  people.forEach(p=>{
+    const card=document.createElement("div"); card.className="person";
+    const nm=document.createElement("div"); nm.className="nm"; nm.textContent=p.full_name||"(name not set)";
+    card.append(nm);
+    if(p.family){ const f=document.createElement("div"); f.className="fam"; f.textContent=p.family; card.append(f); }
+    const c=document.createElement("div"); c.className="contact";
+    if(p.phone){ const a=document.createElement("a"); a.href="tel:"+p.phone; a.textContent=p.phone; c.append(a); }
+    if(p.phone && p.email) c.append(document.createTextNode("  •  "));
+    if(p.email){ const a=document.createElement("a"); a.href="mailto:"+p.email; a.textContent=p.email; c.append(a); }
+    card.append(c);
+    grid.append(card);
+  });
+}
+
+// ---- Boot: decide which view to show ----
+async function boot(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session){
+    $("signOutBtn").hidden=false;
+    $("whoami").textContent = session.user.email;
+    show("appView");
+    await loadProfile(session.user.id);
+    await loadDirectory();
+  } else {
+    show("loginView");
+  }
+}
+sb.auth.onAuthStateChange((_event, session)=>{ if(session) boot(); });
+boot();
+</script>
+</body>
+</html>
