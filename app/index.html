@@ -20,14 +20,23 @@
     --line:#e6ddcd; --white:#fff; --on-brand:#fff; --brand-text:var(--navy);
     --radius:14px; --shadow:0 18px 50px -22px rgba(31,58,77,.35);
     --sans:"Inter",Arial,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --ok-bg:#e2f0e7; --ok-fg:#2f7a52; --warn-bg:#f7e9ce; --warn-fg:#7a5a16;
+    --err-bg:#f6e0dd; --err-fg:#a1442f; --neutral-bg:#eceee9; --neutral-fg:#6e6a5c;
+    --yes-bg:#dceee2; --yes-fg:#2c4e40;
   }
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
     --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --ink-soft:#a6b6c1;
     --line:#2b3c48; --brand-text:#9fc4de; --on-brand:#10202b; --shadow:0 18px 50px -22px rgba(0,0,0,.6);
+    --ok-bg:#173226; --ok-fg:#6fce9c; --warn-bg:#2c2413; --warn-fg:#e0bd6a;
+    --err-bg:#3a201d; --err-fg:#eaa093; --neutral-bg:#24303a; --neutral-fg:#aeb9c2;
+    --yes-bg:#173226; --yes-fg:#7fcea3;
   }}
   :root[data-theme="dark"]{
     --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --ink-soft:#a6b6c1;
     --line:#2b3c48; --brand-text:#9fc4de; --on-brand:#10202b; --shadow:0 18px 50px -22px rgba(0,0,0,.6);
+    --ok-bg:#173226; --ok-fg:#6fce9c; --warn-bg:#2c2413; --warn-fg:#e0bd6a;
+    --err-bg:#3a201d; --err-fg:#eaa093; --neutral-bg:#24303a; --neutral-fg:#aeb9c2;
+    --yes-bg:#173226; --yes-fg:#7fcea3;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
@@ -46,8 +55,8 @@
   .btn:disabled{opacity:.6;cursor:default;}
   .btn-ghost{background:var(--white);color:var(--ink);border-color:var(--line);}
   .note{font-size:13px;padding:10px 12px;border-radius:9px;margin-top:12px;}
-  .note.ok{background:#e2f0e7;color:#2f7a52;border:1px solid #2f7a52;}
-  .note.err{background:#f6e0dd;color:#a1442f;border:1px solid #a1442f;}
+  .note.ok{background:var(--ok-bg);color:var(--ok-fg);border:1px solid var(--ok-fg);}
+  .note.err{background:var(--err-bg);color:var(--err-fg);border:1px solid var(--err-fg);}
   .dir-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px;}
   @media(min-width:620px){.dir-grid{grid-template-columns:1fr 1fr;}}
   .person{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
@@ -89,8 +98,8 @@
   .pr .pm{font-size:12px;color:var(--ink-soft);margin-top:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;}
   .pr .acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
   .pray-btn{font-size:12.5px;padding:5px 12px;border-radius:20px;border:1px solid var(--line);background:var(--cream);color:var(--ink);cursor:pointer;}
-  .pray-btn.on{background:#f7e9ce;border-color:var(--gold);color:#7a5a16;font-weight:600;}
-  .ansbadge{font-size:10.5px;font-weight:700;text-transform:uppercase;background:#e2f0e7;color:#2f7a52;padding:2px 8px;border-radius:20px;}
+  .pray-btn.on{background:var(--warn-bg);border-color:var(--gold);color:var(--warn-fg);font-weight:600;}
+  .ansbadge{font-size:10.5px;font-weight:700;text-transform:uppercase;background:var(--ok-bg);color:var(--ok-fg);padding:2px 8px;border-radius:20px;}
   .mini{font-size:12px;padding:4px 9px;}
   .ev{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
   .ev .et{font-weight:700;font-size:16px;}
@@ -100,9 +109,9 @@
   .ev .erow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;}
   .rsvp-group{display:flex;gap:6px;flex-wrap:wrap;}
   .rsvp-btn{font-size:12px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:var(--cream);color:var(--ink-soft);cursor:pointer;}
-  .rsvp-btn.on-yes{background:#dceee2;border-color:var(--navy);color:#2c4e40;font-weight:600;}
-  .rsvp-btn.on-maybe{background:#f7e9ce;border-color:var(--gold);color:#7a5a16;font-weight:600;}
-  .rsvp-btn.on-no{background:#eeece4;border-color:var(--ink-soft);color:#6e6a5c;font-weight:600;}
+  .rsvp-btn.on-yes{background:var(--yes-bg);border-color:var(--navy);color:var(--yes-fg);font-weight:600;}
+  .rsvp-btn.on-maybe{background:var(--warn-bg);border-color:var(--gold);color:var(--warn-fg);font-weight:600;}
+  .rsvp-btn.on-no{background:var(--neutral-bg);border-color:var(--ink-soft);color:var(--neutral-fg);font-weight:600;}
   .duty-day{margin-top:14px;}
   .duty-day .dd{font-size:13px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.02em;margin-bottom:5px;}
   .duty-item{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;}
@@ -114,7 +123,7 @@
   .mrow .who .em{font-size:12.5px;color:var(--ink-soft);}
   .mrow select,.permrow select{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--cream);color:var(--ink);}
   .mrow .st{font-size:11px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:20px;}
-  .st.approved{background:#e2f0e7;color:#2f7a52;} .st.pending{background:#fdf1d8;color:#9a6b16;} .st.denied{background:#eceee9;color:#6e6a5c;}
+  .st.approved{background:var(--ok-bg);color:var(--ok-fg);} .st.pending{background:var(--warn-bg);color:var(--warn-fg);} .st.denied{background:var(--neutral-bg);color:var(--neutral-fg);}
   .superlbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-soft);white-space:nowrap;}
   .superlbl input{width:15px;height:15px;accent-color:var(--navy);}
   .roleblk{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
@@ -312,7 +321,7 @@
           <div id="profileNote"></div>
           <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-ghost" id="downloadMe" style="font-size:13px;padding:8px 14px;">Download my data</button>
-            <button class="btn btn-ghost" id="deleteMe" style="font-size:13px;padding:8px 14px;color:#a1442f;border-color:#e3b7ad;">Delete my account</button>
+            <button class="btn btn-ghost" id="deleteMe" style="font-size:13px;padding:8px 14px;color:var(--err-fg);border-color:var(--err-fg);">Delete my account</button>
           </div>
         </div>
       </section>
