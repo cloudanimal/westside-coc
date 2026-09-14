@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  (function () { try { var t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+</script>
+<title>Help — Westside Members App</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f3a4d'/%3E%3Cpath d='M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z' fill='%23d8b25e'/%3E%3C/svg%3E" />
+<style>
+  :root{--cream:#faf7f1;--cream-2:#f2ece0;--ink:#23303b;--soft:#566773;--navy:#1f3a4d;--gold:#c1922f;--line:#e6ddcd;--white:#fff;}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--cream:#15222c;--cream-2:#101b23;--white:#1c2c37;--ink:#eaf0f3;--soft:#a6b6c1;--line:#2b3c48;--navy:#9fc4de;}}
+  :root[data-theme="dark"]{--cream:#15222c;--cream-2:#101b23;--white:#1c2c37;--ink:#eaf0f3;--soft:#a6b6c1;--line:#2b3c48;--navy:#9fc4de;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.65;}
+  .site-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:12px clamp(16px,5vw,40px);background:var(--cream);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--navy);text-decoration:none;}
+  .brand svg{width:24px;height:24px;fill:var(--gold);}
+  .brand em{font-style:normal;font-weight:500;color:var(--soft);}
+  .home{font-size:13.5px;color:var(--soft);text-decoration:none;}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 22px 90px;}
+  .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 8px;}
+  h1{font-size:clamp(26px,4vw,34px);margin:0 0 8px;}
+  .lede{color:var(--soft);margin:0 0 26px;}
+  h2{font-size:19px;margin:28px 0 6px;}
+  p,li{color:var(--ink);}
+  a{color:var(--navy);}
+  ol,ul{padding-left:20px;}
+  li{margin:5px 0;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+  .muted{color:var(--soft);font-size:14px;}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="/app/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 5h2v6h6v2h-6v14h-2V13H9v-2h6z"/></svg><span>Westside <em>members app</em></span></a>
+  <a class="home" href="/app/">&larr; Back to app</a>
+</header>
+
+<div class="wrap">
+  <p class="eyebrow">Members App</p>
+  <h1>Help &amp; Guide</h1>
+  <p class="lede">A quick walkthrough of how to use the Westside members app. Questions? Email <a href="mailto:josephwcook@gmail.com">josephwcook@gmail.com</a>.</p>
+
+  <h2>Signing in</h2>
+  <p>Open the app and choose one:</p>
+  <ul>
+    <li><strong>Continue with Google</strong> — one tap if you use a Google/Gmail account.</li>
+    <li><strong>Email me a sign-in link</strong> — enter your email, then click the link we send you. No password to remember.</li>
+  </ul>
+  <p class="muted">The sign-in email comes from "Westside church of Christ." If you don't see it, check your spam folder.</p>
+
+  <h2>Waiting for approval</h2>
+  <p>The first time you sign in, you'll see a <strong>"pending approval"</strong> message. This keeps the directory private to our congregation. A church administrator approves you, usually quickly — and you can fill in your details while you wait.</p>
+
+  <h2>Setting up your profile</h2>
+  <ol>
+    <li>In <strong>Your entry</strong>, tap <strong>Choose photo</strong> to add a picture (a clear headshot is best).</li>
+    <li>Fill in your name, household/family, phone, address, and birthday. Everything except your name is optional.</li>
+    <li>Tap <strong>Save my entry</strong>.</li>
+  </ol>
+  <p class="muted">Adding your address places you on the member map and makes it easy for others to get directions.</p>
+
+  <h2>Using the directory</h2>
+  <ul>
+    <li><strong>Search</strong> by name, family, phone, or email.</li>
+    <li>Turn on <strong>Group by family</strong> to see households together.</li>
+    <li>Tap a <strong>phone number</strong> to call, an <strong>email</strong> to write, or an <strong>address</strong> to open directions in your maps app.</li>
+    <li>Scroll to the <strong>Member map</strong> to see where members are; tap a pin for their name and directions.</li>
+  </ul>
+
+  <h2>Your data &amp; privacy</h2>
+  <p>The directory is visible only to signed-in, approved members. You're always in control of your own entry:</p>
+  <ul>
+    <li><strong>Download my data</strong> — save a copy of your information.</li>
+    <li><strong>Delete my account</strong> — permanently remove your profile. This can't be undone.</li>
+  </ul>
+  <p class="muted">See the full <a href="/app/privacy.html">privacy policy</a>.</p>
+
+  <p style="margin-top:30px;"><a href="/app/">&larr; Back to the app</a></p>
+</div>
+</body>
+</html>
