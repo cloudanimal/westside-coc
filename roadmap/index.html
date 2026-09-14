@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  (function () { try { var t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+</script>
+<title>Members App Roadmap — Westside church of Christ</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f3a4d'/%3E%3Cpath d='M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z' fill='%23d8b25e'/%3E%3C/svg%3E" />
+<style>
+  :root{
+    --cream:#faf7f1; --cream-2:#f2ece0; --ink:#23303b; --soft:#566773;
+    --navy:#1f3a4d; --gold:#c1922f; --gold-soft:#d8b25e; --line:#e6ddcd; --white:#fff;
+    --done:#2f7a52; --done-bg:#e2f0e7; --pri:#a9772f; --pri-bg:#fbefd6; --later:#6c7a86; --later-bg:#eceee9;
+    --sans:"Inter",Arial,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --soft:#a6b6c1; --line:#2b3c48;
+    --navy:#9fc4de; --done:#5fbf8c; --done-bg:#173226; --pri:#e0bd6a; --pri-bg:#2a2415; --later:#8fa0ac; --later-bg:#1b2a34;
+  }}
+  :root[data-theme="dark"]{
+    --cream:#15222c; --cream-2:#101b23; --white:#1c2c37; --ink:#eaf0f3; --soft:#a6b6c1; --line:#2b3c48;
+    --navy:#9fc4de; --done:#5fbf8c; --done-bg:#173226; --pri:#e0bd6a; --pri-bg:#2a2415; --later:#8fa0ac; --later-bg:#1b2a34;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:860px;margin:0 auto;padding:44px 20px 100px;}
+  .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 10px;}
+  h1{font-size:clamp(26px,4vw,36px);margin:0 0 10px;}
+  .lede{color:var(--soft);margin:0 0 8px;max-width:60ch;}
+  .bar{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:22px 0 6px;}
+  .prog{flex:1;min-width:200px;height:10px;background:var(--cream-2);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+  .prog > span{display:block;height:100%;background:var(--done);width:0;transition:width .3s;}
+  .prog-label{font-size:13px;color:var(--soft);font-weight:600;}
+  .legend{font-size:12.5px;color:var(--soft);margin:8px 0 0;}
+  .legend b{color:var(--ink);}
+
+  .phase{background:var(--white);border:1px solid var(--line);border-radius:14px;margin:20px 0;overflow:hidden;}
+  .phase > h2{font-size:17px;margin:0;padding:15px 18px;background:var(--cream-2);display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .phase > h2 .tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:20px;}
+  .tag.pri{background:var(--pri-bg);color:var(--pri);}
+  .tag.next{background:var(--done-bg);color:var(--done);}
+  .tag.later{background:var(--later-bg);color:var(--later);}
+  .item{display:flex;gap:12px;padding:13px 18px;border-top:1px solid var(--line);align-items:flex-start;}
+  .item input{margin-top:3px;width:17px;height:17px;flex:none;accent-color:var(--navy);cursor:pointer;}
+  .item .body{flex:1;}
+  .item .t{font-weight:600;font-size:15px;}
+  .item .d{font-size:13.5px;color:var(--soft);margin-top:2px;}
+  .badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+  .badge.done{background:var(--done-bg);color:var(--done);}
+  .badge.star{background:var(--pri-bg);color:var(--pri);}
+  .item.checked .t{text-decoration:line-through;color:var(--soft);}
+  footer{color:var(--soft);font-size:12.5px;margin-top:30px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Internal &middot; Not linked publicly</p>
+  <h1>Members App — Roadmap</h1>
+  <p class="lede">The feature plan for the Westside church of Christ members app. Check items off as they ship — progress saves on this device.</p>
+
+  <div class="bar">
+    <div class="prog"><span id="progFill"></span></div>
+    <div class="prog-label" id="progLabel">0 of 0 done</div>
+  </div>
+  <p class="legend"><b>✅ Done</b> already built &nbsp;·&nbsp; <b>⭐ Priority</b> do before publishing &nbsp;·&nbsp; check the box when a piece ships</p>
+
+  <div id="roadmap"></div>
+
+  <footer>Living document. Reorder or add items anytime.</footer>
+</div>
+
+<script>
+const PHASES = [
+  { name:"Foundation — accounts & access", tag:"pri", tagText:"Phase 1 · Priority", items:[
+    ["Login (email link + Google)", "Passwordless email sign-in and one-tap Google, both live.", "done"],
+    ["Auto-created profiles on first sign-in", "A profile row is created automatically when someone signs in.", "done"],
+    ["Member gating / approval", "Only real congregation members get in — admin approves new sign-ups or an allowlist. Prerequisite to publishing.", "star"],
+    ["Roles (member / admin)", "Admins can edit anyone, approve members, and post announcements.", "star"],
+    ["Onboarding", "A 'complete your profile' prompt on first login.", ""],
+    ["Account deletion / data export", "Let a member remove their data; ties to the privacy policy.", ""],
+  ]},
+  { name:"Member profiles & directory", tag:"pri", tagText:"Phase 1 · Priority", items:[
+    ["Basic directory (view all, edit own)", "See everyone; edit your own entry.", "done"],
+    ["Richer profile fields", "Photo, household, address, birthday, anniversary, spouse & children, member-since, baptism date, roles, notes.", "star"],
+    ["Photo upload", "Member photos via Supabase Storage.", "star"],
+    ["Search / filter / sort", "Find people by name, family, or role.", "star"],
+    ["Family / household grouping", "See a whole household together.", ""],
+    ["Per-field privacy", "Let members hide their phone or address.", ""],
+    ["Quick actions", "Tap to call, text, email, or get directions.", ""],
+    ["Member map", "Optional map of where households are.", ""],
+  ]},
+  { name:"Communication", tag:"next", tagText:"Phase 2", items:[
+    ["Announcements / bulletin board", "Admins post; members read.", ""],
+    ["Prayer wall", "Post requests, follow them, mark answered.", ""],
+    ["Text / email blasts", "Admin to members — where Flocknote/Twilio plug in.", ""],
+    ["Notifications", "Email or push when something is posted.", ""],
+  ]},
+  { name:"Calendar & serving", tag:"next", tagText:"Phase 2", items:[
+    ["Church calendar", "Services, classes, and events in one place.", ""],
+    ["Event details + RSVP / sign-ups", "Meals, nursery, cleaning rotations.", ""],
+    ["Duty scheduler", "Who leads singing, prayers, communion, teaching each week.", ""],
+    ["Calendar export", "Subscribe from a phone calendar.", ""],
+  ]},
+  { name:"Ministry & care", tag:"later", tagText:"Phase 3", items:[
+    ["Attendance tracking", "Record and review attendance.", ""],
+    ["Care / visitation list", "Shut-ins, hospital, who needs a visit.", ""],
+    ["Small groups / Bible study groups", "Organize study groups.", ""],
+    ["Sermon & class archive", "Audio, video, and notes.", ""],
+    ["Bible reading plans", "Shared reading plans.", ""],
+  ]},
+  { name:"Content & files", tag:"later", tagText:"Phase 3", items:[
+    ["Document sharing", "Bulletins, class handouts, forms.", ""],
+    ["Photo gallery / picture board", "Shared photos of church life.", ""],
+    ["Forms", "Visitor card, contact-update, prayer request.", ""],
+  ]},
+  { name:"Admin & operations", tag:"later", tagText:"Phase 3", items:[
+    ["Admin dashboard", "Manage members, approve joins, assign roles.", ""],
+    ["Giving", "An online giving link; admin-only contribution tracking/statements (sensitive).", ""],
+    ["Reports / exports", "Printable directory PDF, attendance reports.", ""],
+    ["Data import", "Bring members in from the old system.", ""],
+    ["Audit log", "Who changed what.", ""],
+  ]},
+  { name:"Platform polish", tag:"later", tagText:"Phase 4", items:[
+    ["Installable (PWA)", "Add-to-home-screen; feels like a real app.", ""],
+    ["Custom app domain", "e.g. app.westsidenewberrychurchofchrist.com.", ""],
+    ["Mobile-first layout everywhere", "Great on phones throughout.", ""],
+  ]},
+];
+
+const KEY = "westside_roadmap_v1";
+let checks = {};
+try { checks = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ checks = {}; }
+
+function keyFor(p, t){ return p + "::" + t; }
+
+function render(){
+  const root = document.getElementById("roadmap");
+  root.textContent = "";
+  PHASES.forEach(ph => {
+    const sec = document.createElement("div"); sec.className = "phase";
+    const h = document.createElement("h2");
+    const nm = document.createElement("span"); nm.textContent = ph.name;
+    const tg = document.createElement("span"); tg.className = "tag " + ph.tag; tg.textContent = ph.tagText;
+    h.append(nm, tg); sec.append(h);
+    ph.items.forEach(([t, d, status]) => {
+      const k = keyFor(ph.name, t);
+      const done = status === "done";
+      const row = document.createElement("label"); row.className = "item";
+      const cb = document.createElement("input"); cb.type = "checkbox";
+      cb.checked = done || !!checks[k];
+      if (done) cb.disabled = true;
+      const body = document.createElement("div"); body.className = "body";
+      const tt = document.createElement("div"); tt.className = "t"; tt.textContent = t;
+      if (status === "done"){ const b=document.createElement("span"); b.className="badge done"; b.textContent="Done"; tt.append(b); }
+      if (status === "star"){ const b=document.createElement("span"); b.className="badge star"; b.textContent="Priority"; tt.append(b); }
+      const dd = document.createElement("div"); dd.className = "d"; dd.textContent = d;
+      body.append(tt, dd); row.append(cb, body);
+      if (cb.checked) row.classList.add("checked");
+      cb.addEventListener("change", () => {
+        if (cb.checked) checks[k] = true; else delete checks[k];
+        row.classList.toggle("checked", cb.checked);
+        try { localStorage.setItem(KEY, JSON.stringify(checks)); } catch(e){}
+        updateProgress();
+      });
+      sec.append(row);
+    });
+    root.append(sec);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  let total = 0, done = 0;
+  PHASES.forEach(ph => ph.items.forEach(([t, d, status]) => {
+    total++;
+    if (status === "done" || checks[keyFor(ph.name, t)]) done++;
+  }));
+  document.getElementById("progFill").style.width = total ? (done/total*100)+"%" : "0";
+  document.getElementById("progLabel").textContent = done + " of " + total + " done";
+}
+
+render();
+</script>
+</body>
+</html>
