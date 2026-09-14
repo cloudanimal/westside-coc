@@ -62,6 +62,10 @@
   .person .fam{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:1px;}
   .person .contact{font-size:14px;color:var(--ink-soft);margin-top:6px;}
   .person .contact a{text-decoration:underline;}
+  .pcard-top{display:flex;gap:12px;align-items:center;}
+  .avatar-sm{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--cream);border:1px solid var(--line);flex:none;}
+  .avatar-row{display:flex;gap:14px;align-items:center;margin-bottom:16px;}
+  .avatar-preview{width:66px;height:66px;border-radius:50%;object-fit:cover;background:var(--cream);border:1px solid var(--line);flex:none;}
   .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 4px;}
   .section-head h2{font-size:18px;margin:0;}
   .pending-actions{display:flex;gap:8px;margin-top:10px;}
@@ -117,9 +121,19 @@
       <h2>Your entry</h2>
     </div>
     <div class="card">
+      <div class="avatar-row">
+        <img id="pAvatar" class="avatar-preview" alt="Your photo" />
+        <div>
+          <label class="btn btn-ghost" for="pPhoto" style="cursor:pointer;">Choose photo</label>
+          <input id="pPhoto" type="file" accept="image/*" hidden />
+          <div class="muted" style="font-size:12px;margin-top:5px;">A clear headshot works best.</div>
+        </div>
+      </div>
       <div class="field"><label for="pName">Name</label><input id="pName" type="text" placeholder="First and last name" /></div>
       <div class="field"><label for="pFamily">Family / household</label><input id="pFamily" type="text" placeholder="e.g. The Cook family" /></div>
       <div class="field"><label for="pPhone">Phone</label><input id="pPhone" type="tel" placeholder="Optional" /></div>
+      <div class="field"><label for="pAddress">Address</label><input id="pAddress" type="text" placeholder="Optional" /></div>
+      <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" /></div>
       <button class="btn" id="saveProfileBtn">Save my entry</button>
       <div id="profileNote"></div>
     </div>
@@ -159,6 +173,12 @@ const $ = id => document.getElementById(id);
 function show(view){ ["bootView","loginView","appView"].forEach(v=>$(v).hidden = (v!==view)); }
 function note(el, msg, kind){ el.innerHTML=""; if(!msg) return; const d=document.createElement("div"); d.className="note "+kind; d.textContent=msg; el.append(d); }
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+function initialsAvatar(name){
+  const ch=((name||"?").trim().charAt(0)||"?").toUpperCase();
+  const svg="<svg xmlns='http://www.w3.org/2000/svg' width='66' height='66'><rect width='66' height='66' fill='#e6ddcd'/><text x='50%' y='55%' font-family='Inter,sans-serif' font-size='30' fill='#1f3a4d' text-anchor='middle' dominant-baseline='middle'>"+ch+"</text></svg>";
+  return "data:image/svg+xml,"+encodeURIComponent(svg);
+}
+function setAvatar(img, url, name){ img.src = url || initialsAvatar(name); }
 
 // ---- Auth: send magic link ----
 $("sendLinkBtn").addEventListener("click", async ()=>{
@@ -187,9 +207,33 @@ $("signOutBtn").addEventListener("click", async ()=>{ await sb.auth.signOut(); l
 // ---- Directory ----
 async function loadProfile(userId){
   const { data } = await sb.from("profiles").select("*").eq("id", userId).single();
-  if(data){ $("pName").value=data.full_name||""; $("pFamily").value=data.family||""; $("pPhone").value=data.phone||""; }
+  if(data){
+    $("pName").value=data.full_name||"";
+    $("pFamily").value=data.family||"";
+    $("pPhone").value=data.phone||"";
+    $("pAddress").value=data.address||"";
+    $("pBirthday").value=data.birthday||"";
+    setAvatar($("pAvatar"), data.photo_url, data.full_name||data.email);
+  }
   return data;
 }
+
+// ---- Photo upload ----
+$("pPhoto").addEventListener("change", async (e)=>{
+  const file=e.target.files[0]; if(!file) return;
+  const { data:{ user } } = await sb.auth.getUser(); if(!user) return;
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
+  const path=user.id+"/"+Date.now()+"."+ext;
+  note($("profileNote"),"Uploading photo…","ok");
+  const up=await sb.storage.from("avatars").upload(path, file, { upsert:true, contentType:file.type });
+  if(up.error){ note($("profileNote"), up.error.message, "err"); return; }
+  const { data:{ publicUrl } } = sb.storage.from("avatars").getPublicUrl(path);
+  const { error } = await sb.from("profiles").update({ photo_url: publicUrl }).eq("id", user.id);
+  if(error){ note($("profileNote"), error.message, "err"); return; }
+  $("pAvatar").src = publicUrl;
+  note($("profileNote"),"Photo updated.","ok");
+  loadDirectory();
+});
 $("saveProfileBtn").addEventListener("click", async ()=>{
   const { data:{ user } } = await sb.auth.getUser();
   if(!user) return;
@@ -198,6 +242,8 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
     full_name: $("pName").value.trim(),
     family: $("pFamily").value.trim(),
     phone: $("pPhone").value.trim(),
+    address: $("pAddress").value.trim(),
+    birthday: $("pBirthday").value || null,
   }).eq("id", user.id);
   btn.disabled=false; btn.textContent="Save my entry";
   if(error){ note($("profileNote"), error.message, "err"); }
@@ -205,16 +251,20 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
 });
 
 async function loadDirectory(){
-  const { data, error } = await sb.from("profiles").select("full_name,family,phone,email").eq("status","approved").order("full_name");
+  const { data, error } = await sb.from("profiles").select("full_name,family,phone,email,photo_url").eq("status","approved").order("full_name");
   const grid=$("dirGrid"); grid.innerHTML="";
   if(error){ note($("profileNote"), error.message, "err"); return; }
   const people=(data||[]).filter(p=>p.full_name||p.email);
   $("dirCount").textContent = people.length + (people.length===1?" member":" members");
   people.forEach(p=>{
     const card=document.createElement("div"); card.className="person";
+    const top=document.createElement("div"); top.className="pcard-top";
+    const av=document.createElement("img"); av.className="avatar-sm"; av.alt=""; setAvatar(av, p.photo_url, p.full_name||p.email);
+    const info=document.createElement("div");
     const nm=document.createElement("div"); nm.className="nm"; nm.textContent=p.full_name||"(name not set)";
-    card.append(nm);
-    if(p.family){ const f=document.createElement("div"); f.className="fam"; f.textContent=p.family; card.append(f); }
+    info.append(nm);
+    if(p.family){ const f=document.createElement("div"); f.className="fam"; f.textContent=p.family; info.append(f); }
+    top.append(av, info); card.append(top);
     const c=document.createElement("div"); c.className="contact";
     if(p.phone){ const a=document.createElement("a"); a.href="tel:"+p.phone; a.textContent=p.phone; c.append(a); }
     if(p.phone && p.email) c.append(document.createTextNode("  •  "));
