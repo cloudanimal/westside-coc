@@ -123,6 +123,11 @@
       <p class="muted" style="margin:6px 0 0;">Thanks for signing in. A church administrator will approve your access shortly. You can fill in your details below in the meantime, and the directory will appear once you are approved.</p>
     </div>
 
+    <div id="onboardNotice" class="card" hidden style="margin-top:14px;border-color:var(--gold-soft);border-left:4px solid var(--gold);">
+      <strong>👋 Welcome! Let's set up your profile.</strong>
+      <p class="muted" style="margin:6px 0 0;">Add your name, a photo, and how to reach you so the church family can connect with you. It only takes a minute — just fill in the fields below and hit Save.</p>
+    </div>
+
     <div class="section-head">
       <h2>Your entry</h2>
     </div>
@@ -257,7 +262,7 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
   }).eq("id", user.id);
   btn.disabled=false; btn.textContent="Save my entry";
   if(error){ note($("profileNote"), error.message, "err"); }
-  else { note($("profileNote"), "Saved.", "ok"); loadDirectory(); }
+  else { note($("profileNote"), "Saved.", "ok"); loadDirectory(); $("onboardNotice").hidden = !!$("pName").value.trim(); }
 });
 
 let dirPeople = [];
@@ -357,6 +362,9 @@ async function boot(){
     $("pendingNotice").hidden = approved;
     $("dirSection").hidden = !approved;
     $("adminPanel").hidden = !admin;
+    const incomplete = !me || !((me.full_name||"").trim());
+    $("onboardNotice").hidden = !incomplete;
+    if(incomplete){ setTimeout(()=>{ try{ $("pName").focus(); }catch(e){} }, 350); }
     if(approved) await loadDirectory();
     if(admin) await loadPending();
   } else {
