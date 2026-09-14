@@ -64,6 +64,10 @@
   .person .contact a{text-decoration:underline;}
   .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 4px;}
   .section-head h2{font-size:18px;margin:0;}
+  .pending-actions{display:flex;gap:8px;margin-top:10px;}
+  .pending-actions .btn{padding:7px 14px;font-size:13px;}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:100;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   [hidden]{display:none!important;}
 </style>
 </head>
@@ -104,6 +108,11 @@
     <h1>Church Directory</h1>
     <p class="muted">Signed in as <strong id="whoami"></strong>.</p>
 
+    <div id="pendingNotice" class="card" hidden style="margin-top:14px;border-color:var(--gold);">
+      <strong>Your access is pending approval.</strong>
+      <p class="muted" style="margin:6px 0 0;">Thanks for signing in. A church administrator will approve your access shortly. You can fill in your details below in the meantime, and the directory will appear once you are approved.</p>
+    </div>
+
     <div class="section-head">
       <h2>Your entry</h2>
     </div>
@@ -115,17 +124,29 @@
       <div id="profileNote"></div>
     </div>
 
-    <div class="section-head">
-      <h2>Everyone</h2>
-      <span class="muted" id="dirCount"></span>
+    <section id="adminPanel" hidden>
+      <div class="section-head">
+        <h2>Pending approvals</h2>
+        <span class="muted" id="pendingCount"></span>
+      </div>
+      <div class="dir-grid" id="pendingList"></div>
+    </section>
+
+    <div id="dirSection">
+      <div class="section-head">
+        <h2>Everyone</h2>
+        <span class="muted" id="dirCount"></span>
+      </div>
+      <div class="dir-grid" id="dirGrid"></div>
     </div>
-    <div class="dir-grid" id="dirGrid"></div>
   </section>
 
   <section id="bootView">
     <p class="muted">Loading…</p>
   </section>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
@@ -137,6 +158,7 @@ const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 const $ = id => document.getElementById(id);
 function show(view){ ["bootView","loginView","appView"].forEach(v=>$(v).hidden = (v!==view)); }
 function note(el, msg, kind){ el.innerHTML=""; if(!msg) return; const d=document.createElement("div"); d.className="note "+kind; d.textContent=msg; el.append(d); }
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
 
 // ---- Auth: send magic link ----
 $("sendLinkBtn").addEventListener("click", async ()=>{
@@ -166,6 +188,7 @@ $("signOutBtn").addEventListener("click", async ()=>{ await sb.auth.signOut(); l
 async function loadProfile(userId){
   const { data } = await sb.from("profiles").select("*").eq("id", userId).single();
   if(data){ $("pName").value=data.full_name||""; $("pFamily").value=data.family||""; $("pPhone").value=data.phone||""; }
+  return data;
 }
 $("saveProfileBtn").addEventListener("click", async ()=>{
   const { data:{ user } } = await sb.auth.getUser();
@@ -182,7 +205,7 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
 });
 
 async function loadDirectory(){
-  const { data, error } = await sb.from("profiles").select("full_name,family,phone,email").order("full_name");
+  const { data, error } = await sb.from("profiles").select("full_name,family,phone,email").eq("status","approved").order("full_name");
   const grid=$("dirGrid"); grid.innerHTML="";
   if(error){ note($("profileNote"), error.message, "err"); return; }
   const people=(data||[]).filter(p=>p.full_name||p.email);
@@ -201,6 +224,36 @@ async function loadDirectory(){
   });
 }
 
+// ---- Admin: pending approvals ----
+async function loadPending(){
+  const { data, error } = await sb.from("profiles").select("id,full_name,email,phone,family").eq("status","pending").order("email");
+  const list=$("pendingList"); list.innerHTML="";
+  if(error){ toast(error.message); return; }
+  const people=data||[];
+  $("pendingCount").textContent = people.length ? people.length+" waiting" : "None waiting";
+  people.forEach(p=>{
+    const card=document.createElement("div"); card.className="person";
+    const nm=document.createElement("div"); nm.className="nm"; nm.textContent=p.full_name||"(no name yet)";
+    card.append(nm);
+    if(p.family){ const f=document.createElement("div"); f.className="fam"; f.textContent=p.family; card.append(f); }
+    const c=document.createElement("div"); c.className="contact"; c.textContent=p.email+(p.phone?"  •  "+p.phone:""); card.append(c);
+    const actions=document.createElement("div"); actions.className="pending-actions";
+    const approve=document.createElement("button"); approve.className="btn"; approve.textContent="Approve";
+    const deny=document.createElement("button"); deny.className="btn btn-ghost"; deny.textContent="Deny";
+    approve.onclick=()=>setStatus(p.id,"approved");
+    deny.onclick=()=>setStatus(p.id,"denied");
+    actions.append(approve,deny); card.append(actions);
+    list.append(card);
+  });
+}
+async function setStatus(id,status){
+  const { error } = await sb.from("profiles").update({ status }).eq("id",id);
+  if(error){ toast(error.message); return; }
+  toast(status==="approved"?"Approved":"Denied");
+  await loadPending();
+  await loadDirectory();
+}
+
 // ---- Boot: decide which view to show ----
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
@@ -208,8 +261,14 @@ async function boot(){
     $("signOutBtn").hidden=false;
     $("whoami").textContent = session.user.email;
     show("appView");
-    await loadProfile(session.user.id);
-    await loadDirectory();
+    const me = await loadProfile(session.user.id);
+    const approved = !!me && me.status === "approved";
+    const admin = !!me && me.role === "admin";
+    $("pendingNotice").hidden = approved;
+    $("dirSection").hidden = !approved;
+    $("adminPanel").hidden = !admin;
+    if(approved) await loadDirectory();
+    if(admin) await loadPending();
   } else {
     show("loginView");
   }
