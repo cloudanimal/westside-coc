@@ -32,14 +32,6 @@
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
   a{color:inherit;}
-  .site-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
-    padding:12px clamp(16px,5vw,40px);background:var(--cream);border-bottom:1px solid var(--line);}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--brand-text);text-decoration:none;}
-  .brand svg{width:24px;height:24px;fill:var(--gold);}
-  .brand em{font-style:normal;font-weight:500;color:var(--ink-soft);}
-  .header-right{display:flex;align-items:center;gap:10px;}
-  .header-right a.home,.linkbtn{font-size:13.5px;color:var(--ink-soft);text-decoration:none;padding:8px 10px;border-radius:8px;background:none;border:0;cursor:pointer;font-family:inherit;}
-  .header-right a.home:hover,.linkbtn:hover{color:var(--brand-text);}
   .wrap{max-width:900px;margin:0 auto;padding:34px 20px 90px;}
   h1{font-size:clamp(24px,4vw,32px);margin:0 0 6px;}
   .eyebrow{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 10px;}
@@ -78,11 +70,11 @@
   .person .addr a:hover{text-decoration:underline;}
   #memberMap{height:360px;border-radius:12px;border:1px solid var(--line);overflow:hidden;}
   .leaflet-container{font-family:inherit;}
-  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 4px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 4px;}
   .section-head h2{font-size:18px;margin:0;}
   .pending-actions{display:flex;gap:8px;margin-top:10px;}
   .pending-actions .btn{padding:7px 14px;font-size:13px;}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:100;}
+  .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:100;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   textarea{font-family:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--cream);color:var(--ink);width:100%;resize:vertical;}
   textarea:focus{outline:2px solid var(--gold-soft);border-color:var(--gold);}
@@ -130,23 +122,58 @@
   .roleblk .rn{font-weight:700;font-size:15px;}
   .permgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:7px 16px;}
   .permrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;}
+
+  /* ---- App shell ---- */
+  .topbar{position:sticky;top:0;z-index:70;display:flex;align-items:center;justify-content:space-between;gap:10px;height:56px;padding:0 clamp(14px,4vw,26px);background:var(--cream);border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--brand-text);text-decoration:none;}
+  .brand svg{width:22px;height:22px;fill:var(--gold);}
+  .brand em{font-style:normal;font-weight:500;color:var(--ink-soft);}
+  .tb-right{display:flex;align-items:center;gap:4px;}
+  .tb-right a,.tb-right .linkbtn{font-size:13px;color:var(--ink-soft);text-decoration:none;padding:7px 9px;border-radius:8px;background:none;border:0;cursor:pointer;font-family:inherit;}
+  .tb-right a:hover,.tb-right .linkbtn:hover{color:var(--brand-text);background:var(--cream-2);}
+  .theme-btn{display:grid;place-items:center;width:34px;height:34px;color:var(--ink-soft);}
+  .theme-btn svg{width:17px;height:17px;fill:currentColor;}
+  .theme-btn .ic-sun{display:none;}
+  :root[data-theme="dark"] .theme-btn .ic-sun{display:block;} :root[data-theme="dark"] .theme-btn .ic-moon{display:none;}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .theme-btn .ic-sun{display:block;} :root:not([data-theme="light"]) .theme-btn .ic-moon{display:none;}}
+  .app-shell{display:flex;max-width:1120px;margin:0 auto;}
+  .sidebar{width:212px;flex:none;position:sticky;top:56px;align-self:flex-start;height:calc(100dvh - 56px);padding:16px 12px;overflow-y:auto;border-right:1px solid var(--line);}
+  .sidebar-nav{display:flex;flex-direction:column;gap:3px;}
+  .main{flex:1;min-width:0;padding:22px clamp(16px,4vw,30px) 48px;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:var(--ink-soft);cursor:pointer;font-size:14.5px;font-weight:500;text-decoration:none;}
+  .nav-item:hover{background:var(--cream-2);color:var(--ink);}
+  .nav-item.active{background:var(--navy);color:var(--on-brand);}
+  .nav-item svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  .bottomnav{display:none;position:fixed;left:0;right:0;bottom:0;background:var(--cream);border-top:1px solid var(--line);z-index:60;overflow-x:auto;}
+  .bn-inner{display:flex;min-width:100%;}
+  .bn-item{flex:1 0 auto;min-width:60px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px calc(7px + env(safe-area-inset-bottom));color:var(--ink-soft);text-decoration:none;font-size:10.5px;font-weight:600;}
+  .bn-item.active{color:var(--brand-text);}
+  .bn-item svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .view{display:none;}
+  .view.active{display:block;}
+  .view>h1{font-size:clamp(22px,4vw,28px);margin:0 0 6px;}
+  .home-ev{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:block;text-decoration:none;}
+  .home-ev .het{font-weight:600;font-size:14.5px;color:var(--ink);}
+  .home-ev .hew{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:2px;}
+  @media(max-width:899px){ .sidebar{display:none;} .main{padding-bottom:80px;} .bottomnav{display:block;} }
   [hidden]{display:none!important;}
 </style>
 </head>
 <body>
-<header class="site-header">
-  <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 5h2v6h6v2h-6v14h-2V13H9v-2h6z"/></svg><span>Westside <em>church of Christ</em></span></a>
-  <div class="header-right">
-    <a class="home" href="/outreach/">Outreach</a>
-    <a class="home" href="/app/help.html">Help</a>
-    <a class="home" href="/">&larr; Home</a>
+<header class="topbar">
+  <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 5h2v6h6v2h-6v14h-2V13H9v-2h6z"/></svg><span>Westside <em>members</em></span></a>
+  <div class="tb-right">
+    <a href="/outreach/">Outreach</a>
+    <a href="/app/help.html">Help</a>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme">
+      <svg class="ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="ic-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm11-11a1 1 0 0 1-1 1h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1zM5 12a1 1 0 0 1-1 1H2a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1zm14.07-6.07a1 1 0 0 1 0 1.41l-1.41 1.42a1 1 0 1 1-1.42-1.42l1.42-1.41a1 1 0 0 1 1.41 0zM7.76 17.66a1 1 0 0 1 0 1.41l-1.42 1.42a1 1 0 0 1-1.41-1.42l1.41-1.41a1 1 0 0 1 1.42 0zm11.31 1.41a1 1 0 0 1-1.41 0l-1.42-1.41a1 1 0 0 1 1.42-1.42l1.41 1.42a1 1 0 0 1 0 1.41zM7.76 6.34a1 1 0 0 1-1.42 0L4.93 4.93a1 1 0 0 1 1.41-1.41l1.42 1.41a1 1 0 0 1 0 1.41z"/></svg>
+    </button>
     <button class="linkbtn" id="signOutBtn" hidden>Sign out</button>
   </div>
 </header>
 
-<div class="wrap">
-
-  <!-- LOGGED OUT: sign in -->
+<div id="preWrap" class="wrap">
   <section id="loginView" hidden>
     <p class="eyebrow">Members</p>
     <h1>Sign in</h1>
@@ -166,153 +193,166 @@
     </div>
   </section>
 
-  <!-- LOGGED IN: directory -->
-  <section id="appView" hidden>
-    <p class="eyebrow">Members</p>
-    <h1>Church Directory</h1>
-    <p class="muted">Signed in as <strong id="whoami"></strong>.</p>
-
-    <div id="pendingNotice" class="card" hidden style="margin-top:14px;border-color:var(--gold);">
-      <strong>Your access is pending approval.</strong>
-      <p class="muted" style="margin:6px 0 0;">Thanks for signing in. A church administrator will approve your access shortly. You can fill in your details below in the meantime, and the directory will appear once you are approved.</p>
-    </div>
-
-    <div id="onboardNotice" class="card" hidden style="margin-top:14px;border-color:var(--gold-soft);border-left:4px solid var(--gold);">
-      <strong>👋 Welcome! Let's set up your profile.</strong>
-      <p class="muted" style="margin:6px 0 0;">Add your name, a photo, and how to reach you so the church family can connect with you. It only takes a minute — just fill in the fields below and hit Save.</p>
-    </div>
-
-    <section id="annSection" hidden style="margin-top:8px;">
-      <div class="section-head"><h2>Announcements</h2></div>
-      <div id="annCompose" class="card" hidden style="margin-bottom:14px;">
-        <div class="field"><label for="annTitle">Title</label><input id="annTitle" type="text" placeholder="Announcement title" /></div>
-        <div class="field"><label for="annBody">Message</label><textarea id="annBody" rows="3" placeholder="Write your announcement…"></textarea></div>
-        <button class="btn" id="annPostBtn">Post announcement</button>
-        <div id="annNote"></div>
-      </div>
-      <div id="annList"></div>
-    </section>
-
-    <section id="prayerSection" hidden style="margin-top:8px;">
-      <div class="section-head"><h2>Prayer wall</h2></div>
-      <div id="prayerCompose" class="card" hidden style="margin-bottom:14px;">
-        <div class="field"><label for="prBody">Request</label><textarea id="prBody" rows="3" placeholder="Share a prayer request…"></textarea></div>
-        <button class="btn" id="prPostBtn">Post request</button>
-        <div id="prNote"></div>
-      </div>
-      <div id="prayerList"></div>
-    </section>
-
-    <section id="calendarSection" hidden style="margin-top:8px;">
-      <div class="section-head"><h2>Calendar</h2></div>
-      <div id="eventCompose" class="card" hidden style="margin-bottom:14px;">
-        <div class="field"><label for="evTitle">Event</label><input id="evTitle" type="text" placeholder="Event title" /></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <div class="field" style="flex:1;min-width:130px;"><label for="evDate">Date</label><input id="evDate" type="date" /></div>
-          <div class="field" style="flex:1;min-width:110px;"><label for="evTime">Time</label><input id="evTime" type="text" placeholder="e.g. 6:00 PM" /></div>
-        </div>
-        <div class="field"><label for="evLoc">Location</label><input id="evLoc" type="text" placeholder="Optional" /></div>
-        <div class="field"><label for="evDesc">Details</label><textarea id="evDesc" rows="2" placeholder="Optional"></textarea></div>
-        <button class="btn" id="evPostBtn">Add event</button>
-        <div id="evNote"></div>
-      </div>
-      <div id="eventList"></div>
-    </section>
-
-    <section id="dutySection" hidden style="margin-top:8px;">
-      <div class="section-head"><h2>Serving schedule</h2></div>
-      <div id="dutyCompose" class="card" hidden style="margin-bottom:14px;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <div class="field" style="flex:1;min-width:130px;"><label for="dtDate">Date</label><input id="dtDate" type="date" /></div>
-          <div class="field" style="flex:1;min-width:150px;"><label for="dtRole">Duty</label><input id="dtRole" type="text" list="dutyRoles" placeholder="e.g. Song leader" /><datalist id="dutyRoles"><option>Song leader</option><option>Opening prayer</option><option>Lord's Supper</option><option>Closing prayer</option><option>Scripture reading</option><option>Announcements</option><option>Teacher</option></datalist></div>
-        </div>
-        <div class="field"><label for="dtWho">Assigned to</label><input id="dtWho" type="text" placeholder="Name" /></div>
-        <div class="field"><label for="dtNoteInput">Note</label><input id="dtNoteInput" type="text" placeholder="Optional" /></div>
-        <button class="btn" id="dtPostBtn">Add assignment</button>
-        <div id="dtMsg"></div>
-      </div>
-      <div id="dutyList"></div>
-    </section>
-
-    <div class="section-head">
-      <h2>Your entry</h2>
-    </div>
-    <div class="card">
-      <div class="avatar-row">
-        <img id="pAvatar" class="avatar-preview" alt="Your photo" />
-        <div>
-          <label class="btn btn-ghost" for="pPhoto" style="cursor:pointer;">Choose photo</label>
-          <input id="pPhoto" type="file" accept="image/*" hidden />
-          <div class="muted" style="font-size:12px;margin-top:5px;">A clear headshot works best.</div>
-        </div>
-      </div>
-      <div class="field"><label for="pName">Name</label><input id="pName" type="text" placeholder="First and last name" /></div>
-      <div class="field"><label for="pFamily">Family / household</label><input id="pFamily" type="text" placeholder="e.g. The Cook family" /></div>
-      <div class="field"><label for="pPhone">Phone</label><input id="pPhone" type="tel" placeholder="Optional" /></div>
-      <div class="field"><label for="pAddress">Address</label><input id="pAddress" type="text" placeholder="Optional" /></div>
-      <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" /></div>
-      <button class="btn" id="saveProfileBtn">Save my entry</button>
-      <div id="profileNote"></div>
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-ghost" id="downloadMe" style="font-size:13px;padding:8px 14px;">Download my data</button>
-        <button class="btn btn-ghost" id="deleteMe" style="font-size:13px;padding:8px 14px;color:#a1442f;border-color:#e3b7ad;">Delete my account</button>
-      </div>
-    </div>
-
-    <section id="adminPanel" hidden>
-      <div class="section-head"><h2>Admin</h2></div>
-      <div id="exportTools" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px;">
-        <button class="btn btn-ghost" id="exportCsv" style="font-size:13px;padding:8px 14px;">Export members (CSV)</button>
-        <button class="btn btn-ghost" id="backupJson" style="font-size:13px;padding:8px 14px;">Download backup (JSON)</button>
-      </div>
-      <p class="muted" id="backupNote" style="font-size:12px;margin:0 0 16px;">Backups include every member (pending and approved). Keep them somewhere safe as your off-site copy.</p>
-
-      <div id="pendingBlock">
-        <div class="section-head">
-          <h2 style="font-size:17px;">Pending approvals</h2>
-          <span class="muted" id="pendingCount"></span>
-        </div>
-        <div class="dir-grid" id="pendingList"></div>
-      </div>
-
-      <div id="membersAdmin" hidden style="margin-top:24px;">
-        <div class="section-head"><h2 style="font-size:17px;">Members &amp; roles</h2></div>
-        <div id="membersList"></div>
-      </div>
-
-      <div id="rolesAdmin" hidden style="margin-top:24px;">
-        <div class="section-head"><h2 style="font-size:17px;">Roles &amp; permissions</h2></div>
-        <p class="muted" style="font-size:12px;margin:0 0 10px;">Set what each role can do in each section: None, Read, Write, or Full control. Changes save as you go.</p>
-        <div id="rolesList"></div>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-          <input id="newRoleName" type="text" placeholder="New role name" style="flex:1;min-width:180px;font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--cream);color:var(--ink);" />
-          <button class="btn btn-ghost" id="addRoleBtn" style="font-size:13px;padding:9px 14px;">Add role</button>
-        </div>
-      </div>
-    </section>
-
-    <div id="dirSection">
-      <div class="section-head">
-        <h2>Everyone</h2>
-        <span class="muted" id="dirCount"></span>
-      </div>
-      <div class="dir-controls">
-        <input id="dirSearch" type="search" placeholder="Search by name, family, phone, email…" />
-        <label class="grouptoggle"><input type="checkbox" id="dirGroup" /> Group by family</label>
-      </div>
-      <div class="dir-grid" id="dirGrid"></div>
-
-      <div id="mapSection" style="margin-top:26px;">
-        <div class="section-head"><h2>Member map</h2></div>
-        <p class="muted" style="font-size:12.5px;margin:0 0 8px;">Members who add an address appear here. Visible only to signed-in members.</p>
-        <div id="memberMap"></div>
-      </div>
-    </div>
-  </section>
-
   <section id="bootView">
     <p class="muted">Loading…</p>
   </section>
+</div>
+
+<div id="appShell" hidden>
+  <div class="app-shell">
+    <aside class="sidebar"><nav class="sidebar-nav" id="sidebarNav"></nav></aside>
+    <main class="main">
+
+      <!-- HOME -->
+      <section class="view" id="view-home">
+        <h1 id="homeGreeting">Welcome</h1>
+        <div id="pendingNotice" class="card" hidden style="margin-top:10px;border-color:var(--gold);">
+          <strong>Your access is pending approval.</strong>
+          <p class="muted" style="margin:6px 0 0;">Thanks for signing in. A church administrator will approve your access shortly. You can fill in your details on the Profile screen in the meantime.</p>
+        </div>
+        <div id="homeFeeds">
+          <div class="section-head"><h2>Announcements</h2></div>
+          <div id="annCompose" class="card" hidden style="margin-bottom:14px;">
+            <div class="field"><label for="annTitle">Title</label><input id="annTitle" type="text" placeholder="Announcement title" /></div>
+            <div class="field"><label for="annBody">Message</label><textarea id="annBody" rows="3" placeholder="Write your announcement…"></textarea></div>
+            <button class="btn" id="annPostBtn">Post announcement</button>
+            <div id="annNote"></div>
+          </div>
+          <div id="annList"></div>
+          <div class="section-head" id="homeUpHead"><h2>Upcoming</h2></div>
+          <div id="homeEvents"></div>
+        </div>
+      </section>
+
+      <!-- DIRECTORY -->
+      <section class="view" id="view-directory">
+        <h1>Directory</h1>
+        <div id="dirSection">
+          <p class="muted" id="dirCount" style="font-size:13px;margin:2px 0 8px;"></p>
+          <div class="dir-controls">
+            <input id="dirSearch" type="search" placeholder="Search by name, family, phone, email…" />
+            <label class="grouptoggle"><input type="checkbox" id="dirGroup" /> Group by family</label>
+          </div>
+          <div class="dir-grid" id="dirGrid"></div>
+          <div id="mapSection" style="margin-top:26px;">
+            <div class="section-head"><h2>Member map</h2></div>
+            <p class="muted" style="font-size:12.5px;margin:0 0 8px;">Members who add an address appear here.</p>
+            <div id="memberMap"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDAR -->
+      <section class="view" id="view-calendar">
+        <h1>Calendar</h1>
+        <div id="eventCompose" class="card" hidden style="margin:6px 0 16px;">
+          <div class="field"><label for="evTitle">Event</label><input id="evTitle" type="text" placeholder="Event title" /></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="field" style="flex:1;min-width:130px;"><label for="evDate">Date</label><input id="evDate" type="date" /></div>
+            <div class="field" style="flex:1;min-width:110px;"><label for="evTime">Time</label><input id="evTime" type="text" placeholder="e.g. 6:00 PM" /></div>
+          </div>
+          <div class="field"><label for="evLoc">Location</label><input id="evLoc" type="text" placeholder="Optional" /></div>
+          <div class="field"><label for="evDesc">Details</label><textarea id="evDesc" rows="2" placeholder="Optional"></textarea></div>
+          <button class="btn" id="evPostBtn">Add event</button>
+          <div id="evNote"></div>
+        </div>
+        <div id="eventList"></div>
+      </section>
+
+      <!-- PRAYER -->
+      <section class="view" id="view-prayer">
+        <h1>Prayer wall</h1>
+        <div id="prayerCompose" class="card" hidden style="margin:6px 0 16px;">
+          <div class="field"><label for="prBody">Request</label><textarea id="prBody" rows="3" placeholder="Share a prayer request…"></textarea></div>
+          <button class="btn" id="prPostBtn">Post request</button>
+          <div id="prNote"></div>
+        </div>
+        <div id="prayerList"></div>
+      </section>
+
+      <!-- SERVING -->
+      <section class="view" id="view-serving">
+        <h1>Serving schedule</h1>
+        <div id="dutyCompose" class="card" hidden style="margin:6px 0 16px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="field" style="flex:1;min-width:130px;"><label for="dtDate">Date</label><input id="dtDate" type="date" /></div>
+            <div class="field" style="flex:1;min-width:150px;"><label for="dtRole">Duty</label><input id="dtRole" type="text" list="dutyRoles" placeholder="e.g. Song leader" /><datalist id="dutyRoles"><option>Song leader</option><option>Opening prayer</option><option>Lord's Supper</option><option>Closing prayer</option><option>Scripture reading</option><option>Announcements</option><option>Teacher</option></datalist></div>
+          </div>
+          <div class="field"><label for="dtWho">Assigned to</label><input id="dtWho" type="text" placeholder="Name" /></div>
+          <div class="field"><label for="dtNoteInput">Note</label><input id="dtNoteInput" type="text" placeholder="Optional" /></div>
+          <button class="btn" id="dtPostBtn">Add assignment</button>
+          <div id="dtMsg"></div>
+        </div>
+        <div id="dutyList"></div>
+      </section>
+
+      <!-- PROFILE -->
+      <section class="view" id="view-profile">
+        <h1>Your profile</h1>
+        <p class="muted" style="font-size:13px;margin:0 0 12px;">Signed in as <strong id="whoami"></strong>.</p>
+        <div id="onboardNotice" class="card" hidden style="margin-bottom:14px;border-color:var(--gold-soft);border-left:4px solid var(--gold);">
+          <strong>👋 Welcome! Let's set up your profile.</strong>
+          <p class="muted" style="margin:6px 0 0;">Add your name, a photo, and how to reach you so the church family can connect with you.</p>
+        </div>
+        <div class="card">
+          <div class="avatar-row">
+            <img id="pAvatar" class="avatar-preview" alt="Your photo" />
+            <div>
+              <label class="btn btn-ghost" for="pPhoto" style="cursor:pointer;">Choose photo</label>
+              <input id="pPhoto" type="file" accept="image/*" hidden />
+              <div class="muted" style="font-size:12px;margin-top:5px;">A clear headshot works best.</div>
+            </div>
+          </div>
+          <div class="field"><label for="pName">Name</label><input id="pName" type="text" placeholder="First and last name" /></div>
+          <div class="field"><label for="pFamily">Family / household</label><input id="pFamily" type="text" placeholder="e.g. The Cook family" /></div>
+          <div class="field"><label for="pPhone">Phone</label><input id="pPhone" type="tel" placeholder="Optional" /></div>
+          <div class="field"><label for="pAddress">Address</label><input id="pAddress" type="text" placeholder="Optional" /></div>
+          <div class="field"><label for="pBirthday">Birthday</label><input id="pBirthday" type="date" /></div>
+          <button class="btn" id="saveProfileBtn">Save my entry</button>
+          <div id="profileNote"></div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-ghost" id="downloadMe" style="font-size:13px;padding:8px 14px;">Download my data</button>
+            <button class="btn btn-ghost" id="deleteMe" style="font-size:13px;padding:8px 14px;color:#a1442f;border-color:#e3b7ad;">Delete my account</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section class="view" id="view-admin">
+        <h1>Admin</h1>
+        <div id="exportTools" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 6px;">
+          <button class="btn btn-ghost" id="exportCsv" style="font-size:13px;padding:8px 14px;">Export members (CSV)</button>
+          <button class="btn btn-ghost" id="backupJson" style="font-size:13px;padding:8px 14px;">Download backup (JSON)</button>
+        </div>
+        <p class="muted" id="backupNote" style="font-size:12px;margin:0 0 16px;">Backups include every member (pending and approved). Keep them somewhere safe as your off-site copy.</p>
+
+        <div id="pendingBlock">
+          <div class="section-head">
+            <h2 style="font-size:17px;">Pending approvals</h2>
+            <span class="muted" id="pendingCount"></span>
+          </div>
+          <div class="dir-grid" id="pendingList"></div>
+        </div>
+
+        <div id="membersAdmin" hidden style="margin-top:24px;">
+          <div class="section-head"><h2 style="font-size:17px;">Members &amp; roles</h2></div>
+          <div id="membersList"></div>
+        </div>
+
+        <div id="rolesAdmin" hidden style="margin-top:24px;">
+          <div class="section-head"><h2 style="font-size:17px;">Roles &amp; permissions</h2></div>
+          <p class="muted" style="font-size:12px;margin:0 0 10px;">Set what each role can do in each section: None, Read, Write, or Full control. Changes save as you go.</p>
+          <div id="rolesList"></div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+            <input id="newRoleName" type="text" placeholder="New role name" style="flex:1;min-width:180px;font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--cream);color:var(--ink);" />
+            <button class="btn btn-ghost" id="addRoleBtn" style="font-size:13px;padding:9px 14px;">Add role</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <nav class="bottomnav"><div class="bn-inner" id="bottomNav"></div></nav>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -326,7 +366,12 @@ const SUPA_KEY = "sb_publishable_H7XQ6LPVRSQjC2I36iwbMA_TTrLr2VT";
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 const $ = id => document.getElementById(id);
-function show(view){ ["bootView","loginView","appView"].forEach(v=>$(v).hidden = (v!==view)); }
+function show(state){
+  $("preWrap").hidden = (state==="app");
+  $("appShell").hidden = (state!=="app");
+  $("bootView").hidden = (state!=="boot");
+  $("loginView").hidden = (state!=="login");
+}
 function note(el, msg, kind){ el.innerHTML=""; if(!msg) return; const d=document.createElement("div"); d.className="note "+kind; d.textContent=msg; el.append(d); }
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
 function initialsAvatar(name){
@@ -372,31 +417,31 @@ function renderMap(people){
   setTimeout(()=>{ try{ map.invalidateSize(); if(pts.length){ map.fitBounds(pts,{padding:[40,40],maxZoom:14}); } }catch(e){} }, 60);
 }
 
-// ---- Auth: send magic link ----
+// ---- Theme toggle ----
+$("themeBtn").addEventListener("click", ()=>{
+  const cur=document.documentElement.getAttribute("data-theme");
+  let next; if(cur==="dark") next="light"; else if(cur==="light") next="dark"; else next=window.matchMedia("(prefers-color-scheme: dark)").matches?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  try{ localStorage.setItem("theme",next); }catch(e){}
+});
+
+// ---- Auth ----
 $("sendLinkBtn").addEventListener("click", async ()=>{
   const email = $("email").value.trim();
   if(!email){ note($("loginNote"),"Please enter your email.","err"); return; }
   const btn=$("sendLinkBtn"); btn.disabled=true; btn.textContent="Sending…";
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.href.split('#')[0] }
-  });
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href.split('#')[0] } });
   btn.disabled=false; btn.textContent="Email me a sign-in link";
   if(error){ note($("loginNote"), error.message, "err"); }
   else { note($("loginNote"), "Check your email for the sign-in link.", "ok"); }
 });
-
 $("googleBtn").addEventListener("click", async ()=>{
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: window.location.href.split('#')[0] }
-  });
+  const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href.split('#')[0] } });
   if(error) note($("loginNote"), error.message, "err");
 });
+$("signOutBtn").addEventListener("click", async ()=>{ await sb.auth.signOut(); location.hash=''; location.reload(); });
 
-$("signOutBtn").addEventListener("click", async ()=>{ await sb.auth.signOut(); location.reload(); });
-
-// ---- Directory ----
+// ---- Profile ----
 async function loadProfile(userId){
   const { data } = await sb.from("profiles").select("*").eq("id", userId).single();
   if(data){
@@ -409,8 +454,6 @@ async function loadProfile(userId){
   }
   return data;
 }
-
-// ---- Photo upload ----
 $("pPhoto").addEventListener("change", async (e)=>{
   const file=e.target.files[0]; if(!file) return;
   const { data:{ user } } = await sb.auth.getUser(); if(!user) return;
@@ -424,7 +467,6 @@ $("pPhoto").addEventListener("change", async (e)=>{
   if(error){ note($("profileNote"), error.message, "err"); return; }
   $("pAvatar").src = publicUrl;
   note($("profileNote"),"Photo updated.","ok");
-  loadDirectory();
 });
 $("saveProfileBtn").addEventListener("click", async ()=>{
   const { data:{ user } } = await sb.auth.getUser();
@@ -445,11 +487,8 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
     const addr=$("pAddress").value.trim();
     if(addr){ const g=await geocode(addr); await sb.from("profiles").update({ lat:g?g.lat:null, lng:g?g.lng:null }).eq("id", user.id); }
     else { await sb.from("profiles").update({ lat:null, lng:null }).eq("id", user.id); }
-    loadDirectory();
   }
 });
-
-// ---- Member: download my data / delete my account ----
 $("downloadMe").addEventListener("click", async ()=>{
   const { data:{ user } } = await sb.auth.getUser(); if(!user) return;
   const { data } = await sb.from("profiles").select("*").eq("id", user.id).single();
@@ -462,11 +501,11 @@ $("deleteMe").addEventListener("click", async ()=>{
   if(error){ toast(error.message); return; }
   await sb.auth.signOut();
   alert("Your account has been deleted.");
-  location.reload();
+  location.hash=''; location.reload();
 });
 
+// ---- Directory ----
 let dirPeople = [];
-
 function personCard(p){
   const card=document.createElement("div"); card.className="person";
   const top=document.createElement("div"); top.className="pcard-top";
@@ -488,7 +527,6 @@ function personCard(p){
   }
   return card;
 }
-
 function renderDirectory(){
   const grid=$("dirGrid"); grid.innerHTML="";
   const q=($("dirSearch").value||"").trim().toLowerCase();
@@ -513,15 +551,13 @@ function renderDirectory(){
     people.forEach(p=>grid.append(personCard(p)));
   }
 }
-
 async function loadDirectory(){
   const { data, error } = await sb.from("profiles").select("full_name,family,phone,email,photo_url,address,lat,lng").eq("status","approved").order("full_name");
-  if(error){ note($("profileNote"), error.message, "err"); return; }
+  if(error){ return; }
   dirPeople=(data||[]).filter(p=>p.full_name||p.email);
   renderDirectory();
   renderMap(dirPeople);
 }
-
 $("dirSearch").addEventListener("input", renderDirectory);
 $("dirGroup").addEventListener("change", renderDirectory);
 
@@ -552,10 +588,9 @@ async function setStatus(id,status){
   if(error){ toast(error.message); return; }
   toast(status==="approved"?"Approved":"Denied");
   await loadPending();
-  await loadDirectory();
 }
 
-// ---- Admin: export / backup all members ----
+// ---- Admin: export / backup ----
 async function fetchAllMembers(){
   const { data, error } = await sb.from("profiles").select("*").order("full_name");
   if(error){ toast(error.message); return null; }
@@ -574,20 +609,20 @@ $("backupJson").addEventListener("click", async ()=>{
   toast("Backup downloaded ("+rows.length+")");
 });
 
-// ---- RBAC: roles & members management (super-admin) ----
+// ---- RBAC: roles & members management ----
 const SECTIONS = [
   ['directory','Directory'],['calendar','Calendar / Events'],['scheduling','Serving schedule'],['announcements','Announcements'],
   ['prayer_wall','Prayer wall'],['approvals','Member approvals'],['attendance','Attendance'],
   ['care','Care / Visitation'],['files','Files'],['giving','Giving']
 ];
 const LEVELS = [[0,'None'],[1,'Read'],[2,'Write'],[3,'Full control']];
-let superAdmin=false, myPerms={}, allRoles=[];
+let superAdmin=false, myPerms={}, allRoles=[], approvedG=false, canApproveG=false;
+function lvl(sec){ return superAdmin ? 3 : (myPerms[sec]||0); }
 
 async function loadRolesList(){
   const { data } = await sb.from('roles').select('id,name,is_system').order('name');
   allRoles = data||[];
 }
-
 async function loadMembersAdmin(){
   const { data, error } = await sb.from('profiles').select('id,full_name,email,status,role_id,is_super_admin').order('full_name');
   const list=$('membersList'); list.innerHTML='';
@@ -616,7 +651,6 @@ async function loadMembersAdmin(){
     list.append(row);
   });
 }
-
 async function loadRolesEditor(){
   const { data:perms } = await sb.from('role_permissions').select('role_id,section,level');
   const map={}; (perms||[]).forEach(p=>{ (map[p.role_id]=map[p.role_id]||{})[p.section]=p.level; });
@@ -645,7 +679,6 @@ async function loadRolesEditor(){
     blk.append(grid); list.append(blk);
   });
 }
-
 $("addRoleBtn").addEventListener("click", async ()=>{
   const name=$("newRoleName").value.trim(); if(!name) return;
   const { error }=await sb.from('roles').insert({ name });
@@ -823,61 +856,112 @@ $("dtPostBtn").addEventListener("click", async ()=>{
   note($("dtMsg"),"Added.","ok"); loadDuties();
 });
 
-// ---- Boot: decide which view to show ----
+// ---- Home feed: upcoming events ----
+async function loadHomeEvents(){
+  const el=$('homeEvents'); if(!el) return;
+  if(lvl('calendar')<1){ $('homeUpHead').hidden=true; el.innerHTML=''; return; }
+  $('homeUpHead').hidden=false;
+  const today=new Date().toISOString().slice(0,10);
+  const { data } = await sb.from('events').select('title,event_date,start_time,location').gte('event_date',today).order('event_date',{ascending:true}).limit(4);
+  el.innerHTML=''; const rows=data||[];
+  if(!rows.length){ el.innerHTML='<div class="muted" style="font-size:14px;">No upcoming events.</div>'; return; }
+  rows.forEach(ev=>{
+    const d=document.createElement('a'); d.href='#/calendar'; d.className='home-ev';
+    const t=document.createElement('div'); t.className='het'; t.textContent=ev.title;
+    const w=document.createElement('div'); w.className='hew'; w.textContent=fmtDate(ev.event_date)+(ev.start_time?(' · '+ev.start_time):'')+(ev.location?(' · '+ev.location):'');
+    d.append(t,w); el.append(d);
+  });
+}
+
+// ---- Navigation + routing ----
+const IC = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  dir:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16.5 5.2a3 3 0 0 1 0 5.6"/><path d="M21.5 20c0-2.5-1.4-4.5-3.8-5.4"/>',
+  cal:'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.8v3.4M16 2.8v3.4"/>',
+  pray:'<path d="M12 20.5S4 16 4 9.8C4 7 5.9 5.2 8.2 5.2c1.6 0 2.9 1 3.8 2.2.9-1.2 2.2-2.2 3.8-2.2C20.1 5.2 20 7 20 9.8 20 16 12 20.5 12 20.5z"/>',
+  serve:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4"/><path d="m8.8 13 2 2 4-4"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c0-4 3.4-7 7.5-7s7.5 3 7.5 7"/>',
+  admin:'<path d="M12 2.5 5 5.2v6c0 4.6 3.1 8 7 9.3 3.9-1.3 7-4.7 7-9.3v-6L12 2.5z"/>'
+};
+const NAV = [
+  {r:'home',label:'Home',icon:IC.home},
+  {r:'directory',label:'Directory',icon:IC.dir,need:()=>approvedG && lvl('directory')>=1},
+  {r:'calendar',label:'Calendar',icon:IC.cal,need:()=>approvedG && lvl('calendar')>=1},
+  {r:'prayer',label:'Prayer',icon:IC.pray,need:()=>approvedG && lvl('prayer_wall')>=1},
+  {r:'serving',label:'Serving',icon:IC.serve,need:()=>approvedG && lvl('scheduling')>=1},
+  {r:'profile',label:'Profile',icon:IC.user},
+  {r:'admin',label:'Admin',icon:IC.admin,need:()=>superAdmin || canApproveG}
+];
+const ALLROUTES=['home','directory','calendar','prayer','serving','profile','admin'];
+let allowedRoutes=new Set(['home','profile']);
+function buildNav(){
+  const items=NAV.filter(i=>!i.need||i.need());
+  allowedRoutes=new Set(items.map(i=>i.r));
+  const side=$('sidebarNav'), bot=$('bottomNav'); side.innerHTML=''; bot.innerHTML='';
+  items.forEach(i=>{
+    const a=document.createElement('a'); a.href='#/'+i.r; a.className='nav-item'; a.dataset.route=i.r;
+    a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+i.icon+'</svg><span>'+i.label+'</span>'; side.append(a);
+    const b=document.createElement('a'); b.href='#/'+i.r; b.className='bn-item'; b.dataset.route=i.r;
+    b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+i.icon+'</svg><span>'+i.label+'</span>'; bot.append(b);
+  });
+}
+function currentRoute(){ const r=(location.hash||'').replace(/^#\/?/,''); return ALLROUTES.includes(r)?r:'home'; }
+function loadForRoute(r){
+  if(r==='home'){ if(approvedG){ loadAnnouncements(); loadHomeEvents(); } }
+  else if(r==='directory'){ loadDirectory(); setTimeout(()=>{ try{ map&&map.invalidateSize(); }catch(e){} },90); }
+  else if(r==='calendar'){ loadEvents(); }
+  else if(r==='prayer'){ loadPrayers(); }
+  else if(r==='serving'){ loadDuties(); }
+  else if(r==='admin'){ if(canApproveG) loadPending(); if(superAdmin){ loadRolesList().then(()=>{ loadMembersAdmin(); loadRolesEditor(); }); } }
+}
+function route_(){
+  let r=currentRoute(); if(!allowedRoutes.has(r)) r='home';
+  ALLROUTES.forEach(x=>{ const el=$('view-'+x); if(el) el.classList.toggle('active', x===r); });
+  document.querySelectorAll('.nav-item,.bn-item').forEach(a=>a.classList.toggle('active', a.dataset.route===r));
+  window.scrollTo(0,0);
+  loadForRoute(r);
+}
+window.addEventListener('hashchange', route_);
+
+// ---- Boot ----
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
-  if(session){
-    $("signOutBtn").hidden=false;
-    $("whoami").textContent = session.user.email;
-    show("appView");
-    const me = await loadProfile(session.user.id);
-    const approved = !!me && me.status === "approved";
-    superAdmin = !!me && me.is_super_admin === true;
-    myPerms = {};
-    if(me && me.role_id){
-      const { data:mp } = await sb.from('role_permissions').select('section,level').eq('role_id', me.role_id);
-      (mp||[]).forEach(x=>myPerms[x.section]=x.level);
-    }
-    const canApprove = superAdmin || (myPerms['approvals']||0) >= 3;
-    const showAdmin = superAdmin || canApprove;
-    $("pendingNotice").hidden = approved;
-    $("dirSection").hidden = !approved;
-    $("adminPanel").hidden = !showAdmin;
-    $("exportTools").hidden = !superAdmin;
-    $("backupNote").hidden = !superAdmin;
-    $("pendingBlock").hidden = !canApprove;
-    $("membersAdmin").hidden = !superAdmin;
-    $("rolesAdmin").hidden = !superAdmin;
-    myUserId = session.user.id;
-    const annLevel = superAdmin ? 3 : (myPerms['announcements']||0);
-    canWriteAnn = annLevel >= 2; canFullAnn = annLevel >= 3;
-    $("annSection").hidden = !(approved && annLevel >= 1);
-    $("annCompose").hidden = !canWriteAnn;
-    const prLvl = superAdmin ? 3 : (myPerms['prayer_wall']||0);
-    prWrite = prLvl >= 2; prFull = prLvl >= 3;
-    $("prayerSection").hidden = !(approved && prLvl >= 1);
-    $("prayerCompose").hidden = !prWrite;
-    const calLvl = superAdmin ? 3 : (myPerms['calendar']||0);
-    evWrite = calLvl >= 2; evFull = calLvl >= 3;
-    $("calendarSection").hidden = !(approved && calLvl >= 1);
-    $("eventCompose").hidden = !evWrite;
-    const schLvl = superAdmin ? 3 : (myPerms['scheduling']||0);
-    dutyWrite = schLvl >= 2;
-    $("dutySection").hidden = !(approved && schLvl >= 1);
-    $("dutyCompose").hidden = !dutyWrite;
-    const incomplete = !me || !((me.full_name||"").trim());
-    $("onboardNotice").hidden = !incomplete;
-    if(incomplete){ setTimeout(()=>{ try{ $("pName").focus(); }catch(e){} }, 350); }
-    if(approved) await loadDirectory();
-    if(approved && (superAdmin || (myPerms['announcements']||0) >= 1)) await loadAnnouncements();
-    if(approved && (superAdmin || (myPerms['prayer_wall']||0) >= 1)) await loadPrayers();
-    if(approved && (superAdmin || (myPerms['calendar']||0) >= 1)) await loadEvents();
-    if(approved && (superAdmin || (myPerms['scheduling']||0) >= 1)) await loadDuties();
-    if(canApprove) await loadPending();
-    if(superAdmin){ await loadRolesList(); await loadMembersAdmin(); await loadRolesEditor(); }
-  } else {
-    show("loginView");
+  if(!session){ show("login"); return; }
+  $("signOutBtn").hidden=false;
+  $("whoami").textContent = session.user.email;
+  myUserId = session.user.id;
+  const me = await loadProfile(session.user.id);
+  approvedG = !!me && me.status === "approved";
+  superAdmin = !!me && me.is_super_admin === true;
+  myPerms = {};
+  if(me && me.role_id){
+    const { data:mp } = await sb.from('role_permissions').select('section,level').eq('role_id', me.role_id);
+    (mp||[]).forEach(x=>myPerms[x.section]=x.level);
   }
+  canApproveG = superAdmin || (myPerms['approvals']||0) >= 3;
+  canWriteAnn = lvl('announcements')>=2; canFullAnn = lvl('announcements')>=3;
+  prWrite = lvl('prayer_wall')>=2; prFull = lvl('prayer_wall')>=3;
+  evWrite = lvl('calendar')>=2; evFull = lvl('calendar')>=3;
+  dutyWrite = lvl('scheduling')>=2;
+  $("annCompose").hidden = !canWriteAnn;
+  $("prayerCompose").hidden = !prWrite;
+  $("eventCompose").hidden = !evWrite;
+  $("dutyCompose").hidden = !dutyWrite;
+  $("exportTools").hidden = !superAdmin;
+  $("backupNote").hidden = !superAdmin;
+  $("pendingBlock").hidden = !canApproveG;
+  $("membersAdmin").hidden = !superAdmin;
+  $("rolesAdmin").hidden = !superAdmin;
+  $("pendingNotice").hidden = approvedG;
+  $("homeFeeds").hidden = !approvedG;
+  const nm=(me && me.full_name && me.full_name.trim()) ? me.full_name.trim().split(' ')[0] : '';
+  $("homeGreeting").textContent = nm ? ('Welcome, '+nm) : 'Welcome';
+  const incomplete = !me || !((me.full_name||"").trim());
+  $("onboardNotice").hidden = !incomplete;
+  buildNav();
+  show("app");
+  if(incomplete && approvedG && (!location.hash || currentRoute()==='home')){ location.hash = '#/profile'; }
+  route_();
 }
 sb.auth.onAuthStateChange((_event, session)=>{ if(session) boot(); });
 boot();
