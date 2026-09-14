@@ -86,7 +86,7 @@ const PHASES = [
     ["Member gating / approval", "Only real congregation members get in — admin approves new sign-ups. New sign-ins start pending; admin Approve/Deny panel; enforced in the database.", "done"],
     ["Roles (member / admin)", "Admins can edit anyone and approve members. Members cannot self-promote (DB-enforced).", "done"],
     ["Onboarding", "A 'complete your profile' welcome prompt shows on first login (when the name is blank) and auto-focuses the name field; disappears once filled in.", "done"],
-    ["Account deletion / data export", "Let a member remove their data; ties to the privacy policy.", ""],
+    ["Account deletion / data export", "Members can download their data (JSON) and permanently delete their own account from the app (secure RPC; cascades). Privacy policy updated.", "done"],
   ]},
   { name:"Member profiles & directory", tag:"pri", tagText:"Phase 1 · Priority", items:[
     ["Basic directory (view all, edit own)", "See everyone; edit your own entry.", "done"],
@@ -125,7 +125,7 @@ const PHASES = [
   { name:"Admin & operations", tag:"later", tagText:"Phase 3", items:[
     ["Admin dashboard", "Manage members, approve joins, assign roles.", ""],
     ["Giving", "An online giving link; admin-only contribution tracking/statements (sensitive).", ""],
-    ["Reports / exports", "Printable directory PDF, attendance reports.", ""],
+    ["Reports / exports", "Admin can export all members to CSV and download a full JSON backup. Printable directory PDF and attendance reports still to come.", "done"],
     ["Data import", "Bring members in from the old system.", ""],
     ["Audit log", "Who changed what.", ""],
   ]},
