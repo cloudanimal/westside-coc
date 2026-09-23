@@ -120,6 +120,10 @@
   .rsvp-btn.on-yes{background:var(--yes-bg);border-color:var(--navy);color:var(--yes-fg);font-weight:600;}
   .rsvp-btn.on-maybe{background:var(--warn-bg);border-color:var(--gold);color:var(--warn-fg);font-weight:600;}
   .rsvp-btn.on-no{background:var(--neutral-bg);border-color:var(--ink-soft);color:var(--neutral-fg);font-weight:600;}
+  .date-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+  .date-chip{display:inline-flex;align-items:center;gap:5px;background:var(--cream-2);border:1px solid var(--line);border-radius:20px;padding:4px 6px 4px 12px;font-size:12.5px;font-weight:600;color:var(--ink);}
+  .date-chip button{background:none;border:0;color:var(--ink-soft);cursor:pointer;font-size:15px;line-height:1;padding:0 2px;font-family:inherit;}
+  .date-chip button:hover{color:var(--err-fg);}
   .duty-day{margin-top:14px;}
   .duty-day .dd{font-size:13px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.02em;margin-bottom:5px;}
   .duty-item{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;}
@@ -331,9 +335,11 @@
         <div id="eventCompose" class="card" hidden style="margin:6px 0 16px;">
           <div class="field"><label for="evTitle">Event</label><input id="evTitle" type="text" placeholder="Event title" /></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="field" style="flex:1;min-width:130px;"><label for="evDate">Date</label><input id="evDate" type="date" /></div>
+            <div class="field" style="flex:1;min-width:160px;"><label for="evDate">Date(s)</label><div style="display:flex;gap:6px;"><input id="evDate" type="date" style="flex:1;min-width:0;" /><button type="button" class="btn btn-ghost" id="evAddDate" style="padding:8px 13px;">Add</button></div></div>
             <div class="field" style="flex:1;min-width:110px;"><label for="evTime">Time</label><input id="evTime" type="text" placeholder="e.g. 6:00 PM" /></div>
           </div>
+          <div id="evDateChips" class="date-chips"></div>
+          <p class="muted" style="font-size:12px;margin:7px 0 0;">Add one or more dates. They do not need to be next to each other, so a multi-night gospel meeting or a series works too.</p>
           <div class="field"><label for="evLoc">Location</label><input id="evLoc" type="text" placeholder="Optional" /></div>
           <div class="field"><label for="evDesc">Details</label><textarea id="evDesc" rows="2" placeholder="Optional"></textarea></div>
           <button class="btn" id="evPostBtn">Add event</button>
@@ -358,9 +364,11 @@
         <h1>Serving schedule</h1>
         <div id="dutyCompose" class="card" hidden style="margin:6px 0 16px;">
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="field" style="flex:1;min-width:130px;"><label for="dtDate">Date</label><input id="dtDate" type="date" /></div>
+            <div class="field" style="flex:1;min-width:160px;"><label for="dtDate">Date(s)</label><div style="display:flex;gap:6px;"><input id="dtDate" type="date" style="flex:1;min-width:0;" /><button type="button" class="btn btn-ghost" id="dtAddDate" style="padding:8px 13px;">Add</button></div></div>
             <div class="field" style="flex:1;min-width:150px;"><label for="dtRole">Duty</label><input id="dtRole" type="text" list="dutyRoles" placeholder="e.g. Song leader" /><datalist id="dutyRoles"><option>Song leader</option><option>Opening prayer</option><option>Lord's Supper</option><option>Closing prayer</option><option>Scripture reading</option><option>Announcements</option><option>Teacher</option></datalist></div>
           </div>
+          <div id="dtDateChips" class="date-chips"></div>
+          <p class="muted" style="font-size:12px;margin:7px 0 0;">Add one or more dates. Non-adjacent is fine, so you can assign the same duty across several services at once.</p>
           <div class="field"><label for="dtWho">Assigned to</label><input id="dtWho" type="text" placeholder="Name" /></div>
           <div class="field"><label for="dtNoteInput">Note</label><input id="dtNoteInput" type="text" placeholder="Optional" /></div>
           <button class="btn" id="dtPostBtn">Add assignment</button>
@@ -898,14 +906,37 @@ async function loadEvents(){
     c.append(row); list.append(c);
   });
 }
+// Reusable multi-date picker: pick several dates (non-adjacent OK) as removable chips.
+function makeDatePicker(inputId, addBtnId, chipsId){
+  const dates=[]; const input=$(inputId), chips=$(chipsId);
+  const label=d=>new Date(d+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  function render(){
+    chips.innerHTML='';
+    dates.forEach(d=>{
+      const chip=document.createElement('span'); chip.className='date-chip'; chip.append(document.createTextNode(label(d)));
+      const x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','Remove '+label(d)); x.textContent='×';
+      x.onclick=()=>{ const i=dates.indexOf(d); if(i>-1) dates.splice(i,1); render(); };
+      chip.append(x); chips.append(chip);
+    });
+  }
+  function add(){ const v=input.value; if(!v) return; if(!dates.includes(v)){ dates.push(v); dates.sort(); render(); } input.value=''; }
+  $(addBtnId).addEventListener('click', add);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); add(); } });
+  return {
+    get(){ const v=input.value, all=dates.slice(); if(v && !all.includes(v)) all.push(v); all.sort(); return all; },
+    clear(){ dates.length=0; input.value=''; render(); }
+  };
+}
+const evPicker=makeDatePicker('evDate','evAddDate','evDateChips');
 $("evPostBtn").addEventListener("click", async ()=>{
-  const title=$("evTitle").value.trim(), date=$("evDate").value;
-  if(!title||!date){ note($("evNote"),"Add a title and date.","err"); return; }
+  const title=$("evTitle").value.trim(), dates=evPicker.get();
+  if(!title||!dates.length){ note($("evNote"),"Add a title and at least one date.","err"); return; }
   const { data:{ user } } = await sb.auth.getUser();
-  const { error }=await sb.from('events').insert({ title, event_date:date, start_time:$("evTime").value.trim()||null, location:$("evLoc").value.trim()||null, description:$("evDesc").value.trim()||null, created_by:user.id, created_by_name:($("pName").value.trim()||user.email) });
+  const base={ title, start_time:$("evTime").value.trim()||null, location:$("evLoc").value.trim()||null, description:$("evDesc").value.trim()||null, created_by:user.id, created_by_name:($("pName").value.trim()||user.email) };
+  const { error }=await sb.from('events').insert(dates.map(d=>({ ...base, event_date:d })));
   if(error){ note($("evNote"),error.message,"err"); return; }
-  $("evTitle").value='';$("evDate").value='';$("evTime").value='';$("evLoc").value='';$("evDesc").value='';
-  note($("evNote"),"Added.","ok"); loadEvents();
+  $("evTitle").value='';$("evTime").value='';$("evLoc").value='';$("evDesc").value='';evPicker.clear();
+  note($("evNote"), dates.length>1?(dates.length+" dates added."):"Added.", "ok"); loadEvents();
 });
 
 // ---- Duty scheduler ----
@@ -929,14 +960,16 @@ async function loadDuties(){
     dayWrap.append(it);
   });
 }
+const dtPicker=makeDatePicker('dtDate','dtAddDate','dtDateChips');
 $("dtPostBtn").addEventListener("click", async ()=>{
-  const date=$("dtDate").value, role=$("dtRole").value.trim();
-  if(!date||!role){ note($("dtMsg"),"Add a date and a duty.","err"); return; }
+  const role=$("dtRole").value.trim(), dates=dtPicker.get();
+  if(!dates.length||!role){ note($("dtMsg"),"Add at least one date and a duty.","err"); return; }
   const { data:{ user } } = await sb.auth.getUser();
-  const { error }=await sb.from('duties').insert({ duty_date:date, role, assignee_name:$("dtWho").value.trim()||null, note:$("dtNoteInput").value.trim()||null, created_by:user.id });
+  const base={ role, assignee_name:$("dtWho").value.trim()||null, note:$("dtNoteInput").value.trim()||null, created_by:user.id };
+  const { error }=await sb.from('duties').insert(dates.map(d=>({ ...base, duty_date:d })));
   if(error){ note($("dtMsg"),error.message,"err"); return; }
-  $("dtRole").value='';$("dtWho").value='';$("dtNoteInput").value='';
-  note($("dtMsg"),"Added.","ok"); loadDuties();
+  $("dtRole").value='';$("dtWho").value='';$("dtNoteInput").value='';dtPicker.clear();
+  note($("dtMsg"), dates.length>1?(dates.length+" dates added."):"Added.", "ok"); loadDuties();
 });
 
 // ---- Home feed: upcoming events ----
