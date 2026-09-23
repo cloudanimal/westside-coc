@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f3a4d'/%3E%3Cpath d='M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z' fill='%23d8b25e'/%3E%3C/svg%3E" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
@@ -124,6 +125,17 @@
   .date-chip{display:inline-flex;align-items:center;gap:5px;background:var(--cream-2);border:1px solid var(--line);border-radius:20px;padding:4px 6px 4px 12px;font-size:12.5px;font-weight:600;color:var(--ink);}
   .date-chip button{background:none;border:0;color:var(--ink-soft);cursor:pointer;font-size:15px;line-height:1;padding:0 2px;font-family:inherit;}
   .date-chip button:hover{color:var(--err-fg);}
+  /* flatpickr theming to match navy/gold + dark mode */
+  .flatpickr-calendar{background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;}
+  .flatpickr-months,.flatpickr-weekdays,.flatpickr-weekdaycontainer{background:transparent;}
+  .flatpickr-month,.flatpickr-current-month,.flatpickr-monthDropdown-months,.flatpickr-weekday{color:var(--ink)!important;fill:var(--ink);}
+  .flatpickr-prev-month svg,.flatpickr-next-month svg{fill:var(--ink-soft);}
+  .flatpickr-day{color:var(--ink);border-radius:8px;}
+  .flatpickr-day:hover{background:var(--cream-2);border-color:var(--cream-2);}
+  .flatpickr-day.today{border-color:var(--gold);}
+  .flatpickr-day.selected,.flatpickr-day.selected:hover{background:var(--navy);border-color:var(--navy);color:var(--white);}
+  .flatpickr-day.flatpickr-disabled,.flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay{color:var(--ink-soft);opacity:.5;}
+  .flatpickr-calendar.arrowTop:before,.flatpickr-calendar.arrowTop:after,.flatpickr-calendar.arrowBottom:before,.flatpickr-calendar.arrowBottom:after{border-bottom-color:var(--white);border-top-color:var(--white);}
   .duty-day{margin-top:14px;}
   .duty-day .dd{font-size:13px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.02em;margin-bottom:5px;}
   .duty-item{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;}
@@ -335,11 +347,11 @@
         <div id="eventCompose" class="card" hidden style="margin:6px 0 16px;">
           <div class="field"><label for="evTitle">Event</label><input id="evTitle" type="text" placeholder="Event title" /></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="field" style="flex:1;min-width:160px;"><label for="evDate">Date(s)</label><div style="display:flex;gap:6px;"><input id="evDate" type="date" style="flex:1;min-width:0;" /><button type="button" class="btn btn-ghost" id="evAddDate" style="padding:8px 13px;">Add</button></div></div>
+            <div class="field" style="flex:1;min-width:160px;"><label for="evDate">Date(s)</label><input id="evDate" type="text" placeholder="Click to pick day(s)" readonly /></div>
             <div class="field" style="flex:1;min-width:110px;"><label for="evTime">Time</label><input id="evTime" type="text" placeholder="e.g. 6:00 PM" /></div>
           </div>
           <div id="evDateChips" class="date-chips"></div>
-          <p class="muted" style="font-size:12px;margin:7px 0 0;">Add one or more dates. They do not need to be next to each other, so a multi-night gospel meeting or a series works too.</p>
+          <p class="muted" style="font-size:12px;margin:7px 0 0;">Click the field and choose one or more days in the calendar. They do not need to be next to each other, so a multi-night gospel meeting or a series works too.</p>
           <div class="field"><label for="evLoc">Location</label><input id="evLoc" type="text" placeholder="Optional" /></div>
           <div class="field"><label for="evDesc">Details</label><textarea id="evDesc" rows="2" placeholder="Optional"></textarea></div>
           <button class="btn" id="evPostBtn">Add event</button>
@@ -364,11 +376,11 @@
         <h1>Serving schedule</h1>
         <div id="dutyCompose" class="card" hidden style="margin:6px 0 16px;">
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="field" style="flex:1;min-width:160px;"><label for="dtDate">Date(s)</label><div style="display:flex;gap:6px;"><input id="dtDate" type="date" style="flex:1;min-width:0;" /><button type="button" class="btn btn-ghost" id="dtAddDate" style="padding:8px 13px;">Add</button></div></div>
+            <div class="field" style="flex:1;min-width:160px;"><label for="dtDate">Date(s)</label><input id="dtDate" type="text" placeholder="Click to pick day(s)" readonly /></div>
             <div class="field" style="flex:1;min-width:150px;"><label for="dtRole">Duty</label><input id="dtRole" type="text" list="dutyRoles" placeholder="e.g. Song leader" /><datalist id="dutyRoles"><option>Song leader</option><option>Opening prayer</option><option>Lord's Supper</option><option>Closing prayer</option><option>Scripture reading</option><option>Announcements</option><option>Teacher</option></datalist></div>
           </div>
           <div id="dtDateChips" class="date-chips"></div>
-          <p class="muted" style="font-size:12px;margin:7px 0 0;">Add one or more dates. Non-adjacent is fine, so you can assign the same duty across several services at once.</p>
+          <p class="muted" style="font-size:12px;margin:7px 0 0;">Click the field and choose one or more days. Non-adjacent is fine, so you can assign the same duty across several services at once.</p>
           <div class="field"><label for="dtWho">Assigned to</label><input id="dtWho" type="text" placeholder="Name" /></div>
           <div class="field"><label for="dtNoteInput">Note</label><input id="dtNoteInput" type="text" placeholder="Optional" /></div>
           <button class="btn" id="dtPostBtn">Add assignment</button>
@@ -449,6 +461,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 // ---- Your Supabase project ----
@@ -902,37 +915,47 @@ async function loadEvents(){
       const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Delete';
       del.onclick=async()=>{ if(!confirm('Delete this event?'))return; await sb.from('events').delete().eq('id',ev.id); loadEvents(); };
       row.append(del);
+      if(ev.series_id){
+        const dels=document.createElement('button'); dels.className='btn btn-ghost mini'; dels.textContent='Delete all dates';
+        dels.onclick=async()=>{ if(!confirm('Delete every date in this series?'))return; await sb.from('events').delete().eq('series_id',ev.series_id); loadEvents(); };
+        row.append(dels);
+      }
     }
     c.append(row); list.append(c);
   });
 }
-// Reusable multi-date picker: pick several dates (non-adjacent OK) as removable chips.
-function makeDatePicker(inputId, addBtnId, chipsId){
-  const dates=[]; const input=$(inputId), chips=$(chipsId);
-  const label=d=>new Date(d+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'});
-  function render(){
+// Reusable multi-date picker: a flatpickr calendar where several days (non-adjacent
+// OK) can be clicked; selection is mirrored as removable chips below the field.
+const isoDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function makeDatePicker(inputId, chipsId){
+  const chips=$(chipsId);
+  const label=d=>d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  const fp=flatpickr('#'+inputId, {
+    mode:'multiple', dateFormat:'Y-m-d', altInput:true, altFormat:'M j', minDate:'today', showMonths:1,
+    onChange:(sel)=>render(sel)
+  });
+  function render(sel){
     chips.innerHTML='';
-    dates.forEach(d=>{
+    sel.slice().sort((a,b)=>a-b).forEach(d=>{
       const chip=document.createElement('span'); chip.className='date-chip'; chip.append(document.createTextNode(label(d)));
       const x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','Remove '+label(d)); x.textContent='×';
-      x.onclick=()=>{ const i=dates.indexOf(d); if(i>-1) dates.splice(i,1); render(); };
+      x.onclick=()=>{ fp.setDate(fp.selectedDates.filter(s=>s.getTime()!==d.getTime()), true); };
       chip.append(x); chips.append(chip);
     });
   }
-  function add(){ const v=input.value; if(!v) return; if(!dates.includes(v)){ dates.push(v); dates.sort(); render(); } input.value=''; }
-  $(addBtnId).addEventListener('click', add);
-  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); add(); } });
   return {
-    get(){ const v=input.value, all=dates.slice(); if(v && !all.includes(v)) all.push(v); all.sort(); return all; },
-    clear(){ dates.length=0; input.value=''; render(); }
+    get(){ return fp.selectedDates.slice().sort((a,b)=>a-b).map(isoDate); },
+    clear(){ fp.clear(); chips.innerHTML=''; }
   };
 }
-const evPicker=makeDatePicker('evDate','evAddDate','evDateChips');
+function newSeriesId(){ return (crypto.randomUUID?crypto.randomUUID():('s'+Date.now()+Math.random().toString(16).slice(2))); }
+const evPicker=makeDatePicker('evDate','evDateChips');
 $("evPostBtn").addEventListener("click", async ()=>{
   const title=$("evTitle").value.trim(), dates=evPicker.get();
   if(!title||!dates.length){ note($("evNote"),"Add a title and at least one date.","err"); return; }
   const { data:{ user } } = await sb.auth.getUser();
-  const base={ title, start_time:$("evTime").value.trim()||null, location:$("evLoc").value.trim()||null, description:$("evDesc").value.trim()||null, created_by:user.id, created_by_name:($("pName").value.trim()||user.email) };
+  const sid = dates.length>1 ? newSeriesId() : null;
+  const base={ title, series_id:sid, start_time:$("evTime").value.trim()||null, location:$("evLoc").value.trim()||null, description:$("evDesc").value.trim()||null, created_by:user.id, created_by_name:($("pName").value.trim()||user.email) };
   const { error }=await sb.from('events').insert(dates.map(d=>({ ...base, event_date:d })));
   if(error){ note($("evNote"),error.message,"err"); return; }
   $("evTitle").value='';$("evTime").value='';$("evLoc").value='';$("evDesc").value='';evPicker.clear();
@@ -956,16 +979,20 @@ async function loadDuties(){
     const dr=document.createElement('span'); dr.className='dr'; dr.textContent=d.role;
     const da=document.createElement('span'); da.className='da'; da.textContent=' — '+(d.assignee_name||'unassigned')+(d.note?(' ('+d.note+')'):'');
     left.append(dr,da); it.append(left);
-    if(dutyWrite){ const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Remove'; del.onclick=async()=>{ await sb.from('duties').delete().eq('id',d.id); loadDuties(); }; it.append(del); }
+    if(dutyWrite){
+      const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Remove'; del.onclick=async()=>{ await sb.from('duties').delete().eq('id',d.id); loadDuties(); }; it.append(del);
+      if(d.series_id){ const dels=document.createElement('button'); dels.className='btn btn-ghost mini'; dels.textContent='Remove all dates'; dels.onclick=async()=>{ if(!confirm('Remove this duty on every date in the series?'))return; await sb.from('duties').delete().eq('series_id',d.series_id); loadDuties(); }; it.append(dels); }
+    }
     dayWrap.append(it);
   });
 }
-const dtPicker=makeDatePicker('dtDate','dtAddDate','dtDateChips');
+const dtPicker=makeDatePicker('dtDate','dtDateChips');
 $("dtPostBtn").addEventListener("click", async ()=>{
   const role=$("dtRole").value.trim(), dates=dtPicker.get();
   if(!dates.length||!role){ note($("dtMsg"),"Add at least one date and a duty.","err"); return; }
   const { data:{ user } } = await sb.auth.getUser();
-  const base={ role, assignee_name:$("dtWho").value.trim()||null, note:$("dtNoteInput").value.trim()||null, created_by:user.id };
+  const sid = dates.length>1 ? newSeriesId() : null;
+  const base={ role, series_id:sid, assignee_name:$("dtWho").value.trim()||null, note:$("dtNoteInput").value.trim()||null, created_by:user.id };
   const { error }=await sb.from('duties').insert(dates.map(d=>({ ...base, duty_date:d })));
   if(error){ note($("dtMsg"),error.message,"err"); return; }
   $("dtRole").value='';$("dtWho").value='';$("dtNoteInput").value='';dtPicker.clear();

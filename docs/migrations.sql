@@ -223,3 +223,18 @@ create policy "role_perms readable" on public.role_permissions for select to aut
 drop policy if exists "role_perms managed by super" on public.role_permissions;
 create policy "role_perms managed by super" on public.role_permissions for all to authenticated
   using (public.is_super_admin(auth.uid())) with check (public.is_super_admin(auth.uid()));
+
+-- =====================================================================
+-- SECTION 7 — Multi-date series grouping (2026-09-23)
+-- Calendar events and serving duties can be created across several dates
+-- at once (one row per date). A shared series_id links those rows so the
+-- whole set can be deleted together ("Delete all dates").
+-- NOTE: the Phase-2 base tables (announcements, events, event_rsvps,
+-- prayer_requests, prayer_follows, duties) were created directly in the
+-- Supabase dashboard and are not yet reproduced above; capture them here
+-- when convenient so this file rebuilds the whole database.
+-- =====================================================================
+alter table public.events add column if not exists series_id uuid;
+alter table public.duties add column if not exists series_id uuid;
+create index if not exists events_series_idx on public.events (series_id);
+create index if not exists duties_series_idx on public.duties (series_id);
