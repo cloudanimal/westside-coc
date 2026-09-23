@@ -142,12 +142,12 @@
 
   /* ---- App shell ---- */
   .topbar{position:sticky;top:0;z-index:70;display:flex;align-items:center;justify-content:space-between;gap:10px;height:56px;padding:0 clamp(14px,4vw,26px);background:var(--cream);border-bottom:1px solid var(--line);}
-  #installBar{display:flex;align-items:center;gap:10px;padding:9px clamp(14px,4vw,26px);background:var(--navy);color:var(--on-brand);font-size:13.5px;font-weight:500;}
+  #installBar{display:flex;align-items:center;gap:10px;padding:9px clamp(14px,4vw,26px);background:var(--navy);color:#f4efe6;font-size:13.5px;font-weight:500;}
   #installBar svg{width:24px;height:24px;flex:none;border-radius:6px;}
   #installBar #installMsg{flex:1;min-width:0;}
   #installBar #installBtn{flex:none;background:var(--gold-soft);color:var(--navy-2);border:0;border-radius:8px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;}
   #installBar #installBtn:hover{filter:brightness(1.05);}
-  #installBar #installClose{flex:none;background:transparent;border:0;color:var(--on-brand);opacity:.75;font-size:20px;line-height:1;cursor:pointer;padding:2px 4px;}
+  #installBar #installClose{flex:none;background:transparent;border:0;color:inherit;opacity:.75;font-size:20px;line-height:1;cursor:pointer;padding:2px 4px;}
   #installBar #installClose:hover{opacity:1;}
   .brand{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--brand-text);text-decoration:none;}
   .brand svg{width:22px;height:22px;fill:var(--gold);}
@@ -155,7 +155,8 @@
   .tb-right{display:flex;align-items:center;gap:4px;}
   .tb-right a,.tb-right .linkbtn{font-size:13px;color:var(--ink-soft);text-decoration:none;padding:7px 9px;border-radius:8px;background:none;border:0;cursor:pointer;font-family:inherit;}
   .tb-right a:hover,.tb-right .linkbtn:hover{color:var(--brand-text);background:var(--cream-2);}
-  .theme-btn{display:grid;place-items:center;width:34px;height:34px;color:var(--ink-soft);}
+  .theme-btn{display:grid;place-items:center;width:34px;height:34px;color:var(--ink-soft);background:transparent;border:0;padding:0;border-radius:8px;cursor:pointer;}
+  .theme-btn:hover{background:var(--cream-2);color:var(--brand-text);}
   .theme-btn svg{width:17px;height:17px;fill:currentColor;}
   .theme-btn .ic-sun{display:none;}
   :root[data-theme="dark"] .theme-btn .ic-sun{display:block;} :root[data-theme="dark"] .theme-btn .ic-moon{display:none;}
@@ -187,7 +188,9 @@
   .rail-logo .rl-txt b{font-size:14px;color:var(--brand-text);font-weight:700;}
   .rail-logo .rl-txt span{font-size:11px;color:var(--ink-soft);}
   /* Avatar chip */
-  .avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--on-brand);display:grid;place-items:center;font-size:12.5px;font-weight:700;flex:none;overflow:hidden;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#f4efe6;display:grid;place-items:center;font-size:12.5px;font-weight:700;flex:none;overflow:hidden;border:1px solid var(--line);}
+  :root[data-theme="dark"] .avatar{background:var(--gold);color:var(--navy-2);border-color:transparent;}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .avatar{background:var(--gold);color:var(--navy-2);border-color:transparent;}}
   .avatar img{width:100%;height:100%;object-fit:cover;}
   /* Home hero greeting */
   .home-hero{margin:2px 0 20px;}
