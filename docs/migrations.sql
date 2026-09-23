@@ -225,14 +225,159 @@ create policy "role_perms managed by super" on public.role_permissions for all t
   using (public.is_super_admin(auth.uid())) with check (public.is_super_admin(auth.uid()));
 
 -- =====================================================================
--- SECTION 7 — Multi-date series grouping (2026-09-23)
--- Calendar events and serving duties can be created across several dates
--- at once (one row per date). A shared series_id links those rows so the
--- whole set can be deleted together ("Delete all dates").
--- NOTE: the Phase-2 base tables (announcements, events, event_rsvps,
--- prayer_requests, prayer_follows, duties) were created directly in the
--- Supabase dashboard and are not yet reproduced above; capture them here
--- when convenient so this file rebuilds the whole database.
+-- SECTION 7 — Phase-2 engagement tables (announcements, events + RSVP,
+-- prayer wall, serving/duties). These were originally created in the
+-- Supabase dashboard; captured here (verified against the live schema
+-- 2026-09-23) so this file rebuilds the whole database. Every table gates
+-- through can(uid, section, level) from SECTION 6. RLS is enabled with
+-- per-command policies. events/duties include series_id (see note below).
+-- =====================================================================
+
+-- Announcements -------------------------------------------------------
+create table if not exists public.announcements (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  body text not null,
+  author_id uuid references auth.users(id) on delete set null,
+  author_name text,
+  created_at timestamptz default now()
+);
+alter table public.announcements enable row level security;
+drop policy if exists "read announcements" on public.announcements;
+create policy "read announcements" on public.announcements for select to authenticated
+  using (public.can(auth.uid(),'announcements',1));
+drop policy if exists "write announcements" on public.announcements;
+create policy "write announcements" on public.announcements for insert to authenticated
+  with check (public.can(auth.uid(),'announcements',2) and author_id = auth.uid());
+drop policy if exists "edit announcements" on public.announcements;
+create policy "edit announcements" on public.announcements for update to authenticated
+  using (public.can(auth.uid(),'announcements',3) or (public.can(auth.uid(),'announcements',2) and author_id = auth.uid()));
+drop policy if exists "delete announcements" on public.announcements;
+create policy "delete announcements" on public.announcements for delete to authenticated
+  using (public.can(auth.uid(),'announcements',3) or (public.can(auth.uid(),'announcements',2) and author_id = auth.uid()));
+
+-- Events + RSVP -------------------------------------------------------
+create table if not exists public.events (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  location text,
+  event_date date not null,
+  start_time text,
+  created_by uuid references auth.users(id) on delete set null,
+  created_by_name text,
+  created_at timestamptz default now(),
+  series_id uuid
+);
+create index if not exists events_series_idx on public.events (series_id);
+alter table public.events enable row level security;
+drop policy if exists "ev read" on public.events;
+create policy "ev read" on public.events for select to authenticated
+  using (public.can(auth.uid(),'calendar',1));
+drop policy if exists "ev write" on public.events;
+create policy "ev write" on public.events for insert to authenticated
+  with check (public.can(auth.uid(),'calendar',2) and created_by = auth.uid());
+drop policy if exists "ev edit" on public.events;
+create policy "ev edit" on public.events for update to authenticated
+  using (public.can(auth.uid(),'calendar',3) or (public.can(auth.uid(),'calendar',2) and created_by = auth.uid()));
+drop policy if exists "ev delete" on public.events;
+create policy "ev delete" on public.events for delete to authenticated
+  using (public.can(auth.uid(),'calendar',3) or (public.can(auth.uid(),'calendar',2) and created_by = auth.uid()));
+
+create table if not exists public.event_rsvps (
+  event_id uuid not null references public.events(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  response text not null check (response in ('yes','maybe','no')),
+  user_name text,
+  primary key (event_id, user_id)
+);
+alter table public.event_rsvps enable row level security;
+drop policy if exists "rsvp read" on public.event_rsvps;
+create policy "rsvp read" on public.event_rsvps for select to authenticated
+  using (public.can(auth.uid(),'calendar',1));
+drop policy if exists "rsvp add" on public.event_rsvps;
+create policy "rsvp add" on public.event_rsvps for insert to authenticated
+  with check (public.can(auth.uid(),'calendar',1) and user_id = auth.uid());
+drop policy if exists "rsvp upd" on public.event_rsvps;
+create policy "rsvp upd" on public.event_rsvps for update to authenticated
+  using (user_id = auth.uid());
+drop policy if exists "rsvp del" on public.event_rsvps;
+create policy "rsvp del" on public.event_rsvps for delete to authenticated
+  using (user_id = auth.uid());
+
+-- Prayer wall ---------------------------------------------------------
+create table if not exists public.prayer_requests (
+  id uuid primary key default gen_random_uuid(),
+  body text not null,
+  requester_id uuid references auth.users(id) on delete set null,
+  requester_name text,
+  answered boolean not null default false,
+  created_at timestamptz default now()
+);
+alter table public.prayer_requests enable row level security;
+drop policy if exists "pr read" on public.prayer_requests;
+create policy "pr read" on public.prayer_requests for select to authenticated
+  using (public.can(auth.uid(),'prayer_wall',1));
+drop policy if exists "pr write" on public.prayer_requests;
+create policy "pr write" on public.prayer_requests for insert to authenticated
+  with check (public.can(auth.uid(),'prayer_wall',2) and requester_id = auth.uid());
+drop policy if exists "pr edit" on public.prayer_requests;
+create policy "pr edit" on public.prayer_requests for update to authenticated
+  using (public.can(auth.uid(),'prayer_wall',3) or (public.can(auth.uid(),'prayer_wall',2) and requester_id = auth.uid()));
+drop policy if exists "pr delete" on public.prayer_requests;
+create policy "pr delete" on public.prayer_requests for delete to authenticated
+  using (public.can(auth.uid(),'prayer_wall',3) or (public.can(auth.uid(),'prayer_wall',2) and requester_id = auth.uid()));
+
+create table if not exists public.prayer_follows (
+  request_id uuid not null references public.prayer_requests(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  primary key (request_id, user_id)
+);
+alter table public.prayer_follows enable row level security;
+drop policy if exists "pf read" on public.prayer_follows;
+create policy "pf read" on public.prayer_follows for select to authenticated
+  using (public.can(auth.uid(),'prayer_wall',1));
+drop policy if exists "pf add" on public.prayer_follows;
+create policy "pf add" on public.prayer_follows for insert to authenticated
+  with check (public.can(auth.uid(),'prayer_wall',1) and user_id = auth.uid());
+drop policy if exists "pf remove" on public.prayer_follows;
+create policy "pf remove" on public.prayer_follows for delete to authenticated
+  using (user_id = auth.uid());
+
+-- Serving / duties ----------------------------------------------------
+create table if not exists public.duties (
+  id uuid primary key default gen_random_uuid(),
+  duty_date date not null,
+  role text not null,
+  assignee_name text,
+  assignee_id uuid references auth.users(id) on delete set null,
+  note text,
+  created_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz default now(),
+  series_id uuid
+);
+create index if not exists duties_series_idx on public.duties (series_id);
+alter table public.duties enable row level security;
+drop policy if exists "duty read" on public.duties;
+create policy "duty read" on public.duties for select to authenticated
+  using (public.can(auth.uid(),'scheduling',1));
+drop policy if exists "duty write" on public.duties;
+create policy "duty write" on public.duties for insert to authenticated
+  with check (public.can(auth.uid(),'scheduling',2));
+drop policy if exists "duty edit" on public.duties;
+create policy "duty edit" on public.duties for update to authenticated
+  using (public.can(auth.uid(),'scheduling',2));
+drop policy if exists "duty delete" on public.duties;
+create policy "duty delete" on public.duties for delete to authenticated
+  using (public.can(auth.uid(),'scheduling',2));
+
+-- =====================================================================
+-- SECTION 8 — Multi-date series grouping (2026-09-23, applied live)
+-- Historical incremental: events/duties gained series_id so a multi-date
+-- entry (one row per date) can be deleted as a set ("Delete all dates").
+-- The columns/indexes are already included in SECTION 7 above; these
+-- statements are what actually ran against the existing database and are
+-- safe to re-run (idempotent).
 -- =====================================================================
 alter table public.events add column if not exists series_id uuid;
 alter table public.duties add column if not exists series_id uuid;
