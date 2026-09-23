@@ -179,6 +179,35 @@
   .home-ev{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:block;text-decoration:none;}
   .home-ev .het{font-weight:600;font-size:14.5px;color:var(--ink);}
   .home-ev .hew{font-size:12.5px;color:var(--gold);font-weight:600;margin-top:2px;}
+  /* VM-style rail logo tile */
+  .rail-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 14px;margin-bottom:8px;border-bottom:1px solid var(--line);text-decoration:none;}
+  .rail-logo .tile{width:34px;height:34px;border-radius:9px;background:var(--navy);display:grid;place-items:center;flex:none;box-shadow:0 4px 12px -4px rgba(31,58,77,.5);}
+  .rail-logo .tile svg{width:20px;height:20px;fill:var(--gold-soft);}
+  .rail-logo .rl-txt{display:flex;flex-direction:column;line-height:1.15;}
+  .rail-logo .rl-txt b{font-size:14px;color:var(--brand-text);font-weight:700;}
+  .rail-logo .rl-txt span{font-size:11px;color:var(--ink-soft);}
+  /* Avatar chip */
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--on-brand);display:grid;place-items:center;font-size:12.5px;font-weight:700;flex:none;overflow:hidden;}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  /* Home hero greeting */
+  .home-hero{margin:2px 0 20px;}
+  .home-hero h1{font-size:clamp(24px,4.5vw,32px);margin:0;letter-spacing:-.01em;}
+  .home-hero .today{color:var(--ink-soft);font-size:14.5px;margin-top:4px;}
+  /* Stat tiles */
+  .stat-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+  .stat{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:15px 16px;text-decoration:none;display:block;transition:border-color .15s,transform .15s;}
+  .stat:hover{border-color:var(--gold-soft);transform:translateY(-1px);}
+  .stat .num{font-size:30px;font-weight:800;line-height:1;letter-spacing:-.02em;}
+  .stat .lbl{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin-top:9px;}
+  .stat.s-mem .num{color:var(--brand-text);} .stat.s-ev .num{color:var(--gold);} .stat.s-pray .num{color:var(--ok-fg);} .stat.s-news .num{color:var(--navy);}
+  :root[data-theme="dark"] .stat.s-news .num{color:var(--brand-text);}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .stat.s-news .num{color:var(--brand-text);}}
+  /* Home card panels */
+  .home-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  .panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .panel>h2{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px;}
+  @media(max-width:1040px){ .home-cards{grid-template-columns:1fr;} }
+  @media(max-width:560px){ .stat-tiles{grid-template-columns:1fr 1fr;} }
   @media(max-width:899px){ .sidebar{display:none;} .main{padding-bottom:80px;} .bottomnav{display:block;} }
   [hidden]{display:none!important;}
 </style>
@@ -200,6 +229,7 @@
       <svg class="ic-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm11-11a1 1 0 0 1-1 1h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1zM5 12a1 1 0 0 1-1 1H2a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1zm14.07-6.07a1 1 0 0 1 0 1.41l-1.41 1.42a1 1 0 1 1-1.42-1.42l1.42-1.41a1 1 0 0 1 1.41 0zM7.76 17.66a1 1 0 0 1 0 1.41l-1.42 1.42a1 1 0 0 1-1.41-1.42l1.41-1.41a1 1 0 0 1 1.42 0zm11.31 1.41a1 1 0 0 1-1.41 0l-1.42-1.41a1 1 0 0 1 1.42-1.42l1.41 1.42a1 1 0 0 1 0 1.41zM7.76 6.34a1 1 0 0 1-1.42 0L4.93 4.93a1 1 0 0 1 1.41-1.41l1.42 1.41a1 1 0 0 1 0 1.41z"/></svg>
     </button>
     <button class="linkbtn" id="signOutBtn" hidden>Sign out</button>
+    <span class="avatar" id="avatarChip" hidden aria-hidden="true"></span>
   </div>
 </header>
 
@@ -230,27 +260,48 @@
 
 <div id="appShell" hidden>
   <div class="app-shell">
-    <aside class="sidebar"><nav class="sidebar-nav" id="sidebarNav"></nav></aside>
+    <aside class="sidebar">
+      <a class="rail-logo" href="#/home">
+        <span class="tile"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 7h2v5h5v2h-5v11h-2V14h-5v-2h5z"/></svg></span>
+        <span class="rl-txt"><b>Westside</b><span>Members</span></span>
+      </a>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+    </aside>
     <main class="main">
 
       <!-- HOME -->
       <section class="view" id="view-home">
-        <h1 id="homeGreeting">Welcome</h1>
+        <div class="home-hero">
+          <h1 id="homeGreeting">Welcome</h1>
+          <div class="today" id="homeToday"></div>
+        </div>
         <div id="pendingNotice" class="card" hidden style="margin-top:10px;border-color:var(--gold);">
           <strong>Your access is pending approval.</strong>
           <p class="muted" style="margin:6px 0 0;">Thanks for signing in. A church administrator will approve your access shortly. You can fill in your details on the Profile screen in the meantime.</p>
         </div>
         <div id="homeFeeds">
-          <div class="section-head"><h2>Announcements</h2></div>
-          <div id="annCompose" class="card" hidden style="margin-bottom:14px;">
-            <div class="field"><label for="annTitle">Title</label><input id="annTitle" type="text" placeholder="Announcement title" /></div>
-            <div class="field"><label for="annBody">Message</label><textarea id="annBody" rows="3" placeholder="Write your announcement…"></textarea></div>
-            <button class="btn" id="annPostBtn">Post announcement</button>
-            <div id="annNote"></div>
+          <div class="stat-tiles" id="statTiles">
+            <a class="stat s-mem" href="#/directory"><div class="num" id="stMembers">&ndash;</div><div class="lbl">Members</div></a>
+            <a class="stat s-ev" href="#/calendar"><div class="num" id="stEvents">&ndash;</div><div class="lbl">Events this week</div></a>
+            <a class="stat s-pray" href="#/prayer"><div class="num" id="stPrayers">&ndash;</div><div class="lbl">Open prayers</div></a>
+            <a class="stat s-news" href="#/home"><div class="num" id="stNews">&ndash;</div><div class="lbl">Announcements</div></a>
           </div>
-          <div id="annList"></div>
-          <div class="section-head" id="homeUpHead"><h2>Upcoming</h2></div>
-          <div id="homeEvents"></div>
+          <div class="home-cards">
+            <div class="panel">
+              <h2>Announcements</h2>
+              <div id="annCompose" class="card" hidden style="margin-bottom:14px;">
+                <div class="field"><label for="annTitle">Title</label><input id="annTitle" type="text" placeholder="Announcement title" /></div>
+                <div class="field"><label for="annBody">Message</label><textarea id="annBody" rows="3" placeholder="Write your announcement…"></textarea></div>
+                <button class="btn" id="annPostBtn">Post announcement</button>
+                <div id="annNote"></div>
+              </div>
+              <div id="annList"></div>
+            </div>
+            <div class="panel" id="homeUpHead">
+              <h2>Upcoming</h2>
+              <div id="homeEvents"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -936,8 +987,29 @@ function buildNav(){
   });
 }
 function currentRoute(){ const r=(location.hash||'').replace(/^#\/?/,''); return ALLROUTES.includes(r)?r:'home'; }
+async function loadHomeStats(){
+  if(!approvedG) return;
+  const set=(id,v)=>{ const el=$(id); if(el) el.textContent=(v!=null?String(v):'0'); };
+  const hideTile=(sel)=>{ const t=document.querySelector(sel); if(t) t.style.display='none'; };
+  const iso=d=>d.toISOString().slice(0,10);
+  try{ const { count } = await sb.from('profiles').select('id',{count:'exact',head:true}).eq('status','approved'); set('stMembers',count); }catch(e){}
+  try{
+    if(lvl('calendar')>=1){
+      const t=new Date(), end=new Date(); end.setDate(end.getDate()+7);
+      const { count } = await sb.from('events').select('id',{count:'exact',head:true}).gte('event_date',iso(t)).lte('event_date',iso(end));
+      set('stEvents',count);
+    } else hideTile('.stat.s-ev');
+  }catch(e){}
+  try{
+    if(lvl('prayer_wall')>=1){
+      const { count } = await sb.from('prayer_requests').select('id',{count:'exact',head:true}).eq('answered',false);
+      set('stPrayers',count);
+    } else hideTile('.stat.s-pray');
+  }catch(e){}
+  try{ const { count } = await sb.from('announcements').select('id',{count:'exact',head:true}); set('stNews',count); }catch(e){}
+}
 function loadForRoute(r){
-  if(r==='home'){ if(approvedG){ loadAnnouncements(); loadHomeEvents(); } }
+  if(r==='home'){ if(approvedG){ loadHomeStats(); loadAnnouncements(); loadHomeEvents(); } }
   else if(r==='directory'){ loadDirectory(); setTimeout(()=>{ try{ map&&map.invalidateSize(); }catch(e){} },90); }
   else if(r==='calendar'){ loadEvents(); }
   else if(r==='prayer'){ loadPrayers(); }
@@ -985,7 +1057,16 @@ async function boot(){
   $("pendingNotice").hidden = approvedG;
   $("homeFeeds").hidden = !approvedG;
   const nm=(me && me.full_name && me.full_name.trim()) ? me.full_name.trim().split(' ')[0] : '';
-  $("homeGreeting").textContent = nm ? ('Welcome, '+nm) : 'Welcome';
+  $("homeGreeting").textContent = nm ? ('Good to see you, '+nm) : 'Welcome';
+  $("homeToday").textContent = new Date().toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'});
+  // Avatar chip (photo, else initials)
+  const av=$("avatarChip");
+  if(me && me.photo_url){ av.innerHTML='<img src="'+me.photo_url+'" alt="">'; }
+  else {
+    const src=(me && (me.full_name||'').trim()) ? me.full_name.trim() : (session.user.email||'?');
+    av.textContent = src.replace(/[^A-Za-z ]/g,' ').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || src.slice(0,2).toUpperCase();
+  }
+  av.hidden=false;
   const incomplete = !me || !((me.full_name||"").trim());
   $("onboardNotice").hidden = !incomplete;
   buildNav();
