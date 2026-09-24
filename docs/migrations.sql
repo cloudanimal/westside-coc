@@ -383,3 +383,34 @@ alter table public.events add column if not exists series_id uuid;
 alter table public.duties add column if not exists series_id uuid;
 create index if not exists events_series_idx on public.events (series_id);
 create index if not exists duties_series_idx on public.duties (series_id);
+
+-- =====================================================================
+-- SECTION 9 — Explicit Data API grants (added 2026-09-24)
+-- Supabase change: as of 2026-10-30, new projects/tables no longer get an
+-- automatic Data API grant. RLS policies alone are not enough — without a
+-- GRANT, PostgREST returns "permission denied" even when a policy would
+-- allow the request. Existing tables on an existing project keep their
+-- current grants and are unaffected; this section exists so this file
+-- still stands up a working database on a FRESH project after that date.
+-- No table here uses an "anon" RLS policy, so anon is intentionally
+-- omitted — only authenticated (the app's real users) and service_role
+-- (server-side/admin access) are granted. Safe to re-run.
+-- =====================================================================
+grant select, insert, update, delete on public.profiles to authenticated;
+grant select, insert, update, delete on public.profiles to service_role;
+grant select on public.roles to authenticated;
+grant select, insert, update, delete on public.roles to service_role;
+grant select on public.role_permissions to authenticated;
+grant select, insert, update, delete on public.role_permissions to service_role;
+grant select, insert, update, delete on public.announcements to authenticated;
+grant select, insert, update, delete on public.announcements to service_role;
+grant select, insert, update, delete on public.events to authenticated;
+grant select, insert, update, delete on public.events to service_role;
+grant select, insert, update, delete on public.event_rsvps to authenticated;
+grant select, insert, update, delete on public.event_rsvps to service_role;
+grant select, insert, update, delete on public.prayer_requests to authenticated;
+grant select, insert, update, delete on public.prayer_requests to service_role;
+grant select, insert, update, delete on public.prayer_follows to authenticated;
+grant select, insert, update, delete on public.prayer_follows to service_role;
+grant select, insert, update, delete on public.duties to authenticated;
+grant select, insert, update, delete on public.duties to service_role;
