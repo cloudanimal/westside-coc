@@ -141,6 +141,36 @@
   .duty-item{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;}
   .duty-item .dr{font-weight:600;font-size:14px;}
   .duty-item .da{color:var(--ink-soft);font-size:13.5px;}
+  /* Big calendar (merged Calendar + Serving) */
+  .cal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:2px 0 14px;}
+  .cal-nav{display:flex;align-items:center;gap:8px;}
+  .cal-nav h2{font-size:17px;margin:0;min-width:150px;text-align:center;}
+  .cal-nav button{width:32px;height:32px;padding:0;display:grid;place-items:center;font-size:15px;}
+  .cal-nav #calToday{width:auto;padding:0 12px;margin-left:4px;}
+  .cal-legend{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--ink-soft);}
+  .cal-legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;}
+  .dot-ev{background:var(--gold);} .dot-dt{background:var(--navy);}
+  :root[data-theme="dark"] .dot-dt{background:var(--brand-text);}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dot-dt{background:var(--brand-text);}}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .cal-wd{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);text-align:center;padding-bottom:4px;}
+  .cal-day{background:var(--white);border:1px solid var(--line);border-radius:10px;min-height:74px;padding:6px 7px;cursor:pointer;display:flex;flex-direction:column;gap:4px;text-align:left;}
+  .cal-day:hover{border-color:var(--gold-soft);}
+  .cal-day.other-month{opacity:.4;}
+  .cal-day.is-today .cal-daynum{color:var(--gold);font-weight:800;}
+  .cal-day.is-selected{border-color:var(--navy);border-width:2px;background:var(--cream-2);}
+  .cal-daynum{font-size:12.5px;font-weight:600;}
+  .cal-dots{display:flex;gap:3px;flex-wrap:wrap;margin-top:auto;}
+  .cal-dots .dot{width:6px;height:6px;border-radius:50%;}
+  .cal-more{font-size:10px;color:var(--ink-soft);}
+  @media(max-width:640px){ .cal-day{min-height:52px;padding:5px;} .cal-daynum{font-size:11.5px;} }
+  .cal-day-panel{margin-top:20px;}
+  .cal-day-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .cal-day-head h2{font-size:17px;margin:0;}
+  .cal-day-actions{display:flex;gap:8px;}
+  .cal-day-empty{color:var(--ink-soft);font-size:13.5px;padding:4px 2px;}
+  .cal-subhead{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:14px 0 6px;}
+  .cal-subhead:first-child{margin-top:0;}
   .mrow{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:11px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
   .mrow .who{flex:1;min-width:150px;}
   .mrow .who .nm{font-weight:600;font-size:14.5px;}
@@ -342,10 +372,36 @@
         </div>
       </section>
 
-      <!-- CALENDAR -->
+      <!-- CALENDAR (events + serving, merged into one big-calendar interface) -->
       <section class="view" id="view-calendar">
         <h1>Calendar</h1>
-        <div id="eventCompose" class="card" hidden style="margin:6px 0 16px;">
+        <div class="cal-toolbar">
+          <div class="cal-nav">
+            <button type="button" class="btn btn-ghost" id="calPrev" aria-label="Previous month">&lsaquo;</button>
+            <h2 id="calMonthLabel">Month Year</h2>
+            <button type="button" class="btn btn-ghost" id="calNext" aria-label="Next month">&rsaquo;</button>
+            <button type="button" class="btn btn-ghost" id="calToday">Today</button>
+          </div>
+          <div class="cal-legend">
+            <span id="calLegendEv"><span class="dot dot-ev"></span>Events</span>
+            <span id="calLegendDt"><span class="dot dot-dt"></span>Serving</span>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+
+        <div class="cal-day-panel">
+          <div class="cal-day-head">
+            <h2 id="calDayTitle">Pick a day</h2>
+            <div class="cal-day-actions">
+              <button type="button" class="btn btn-ghost mini" id="calAddEventBtn" hidden>+ Add event</button>
+              <button type="button" class="btn btn-ghost mini" id="calAddDutyBtn" hidden>+ Add duty</button>
+            </div>
+          </div>
+          <div id="calDayEvents"></div>
+          <div id="calDayDuties"></div>
+        </div>
+
+        <div id="eventCompose" class="card" hidden style="margin:16px 0;">
           <div class="field"><label for="evTitle">Event</label><input id="evTitle" type="text" placeholder="Event title" /></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <div class="field" style="flex:1;min-width:160px;"><label for="evDate">Date(s)</label><input id="evDate" type="text" placeholder="Click to pick day(s)" readonly /></div>
@@ -356,9 +412,23 @@
           <div class="field"><label for="evLoc">Location</label><input id="evLoc" type="text" placeholder="Optional" /></div>
           <div class="field"><label for="evDesc">Details</label><textarea id="evDesc" rows="2" placeholder="Optional"></textarea></div>
           <button class="btn" id="evPostBtn">Add event</button>
+          <button type="button" class="btn btn-ghost" id="evCancelBtn">Cancel</button>
           <div id="evNote"></div>
         </div>
-        <div id="eventList"></div>
+
+        <div id="dutyCompose" class="card" hidden style="margin:16px 0;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="field" style="flex:1;min-width:160px;"><label for="dtDate">Date(s)</label><input id="dtDate" type="text" placeholder="Click to pick day(s)" readonly /></div>
+            <div class="field" style="flex:1;min-width:150px;"><label for="dtRole">Duty</label><input id="dtRole" type="text" list="dutyRoles" placeholder="e.g. Song leader" /><datalist id="dutyRoles"><option>Song leader</option><option>Opening prayer</option><option>Lord's Supper</option><option>Closing prayer</option><option>Scripture reading</option><option>Announcements</option><option>Teacher</option></datalist></div>
+          </div>
+          <div id="dtDateChips" class="date-chips"></div>
+          <p class="muted" style="font-size:12px;margin:7px 0 0;">Click the field and choose one or more days. Non-adjacent is fine, so you can assign the same duty across several services at once.</p>
+          <div class="field"><label for="dtWho">Assigned to</label><input id="dtWho" type="text" placeholder="Name" /></div>
+          <div class="field"><label for="dtNoteInput">Note</label><input id="dtNoteInput" type="text" placeholder="Optional" /></div>
+          <button class="btn" id="dtPostBtn">Add assignment</button>
+          <button type="button" class="btn btn-ghost" id="dtCancelBtn">Cancel</button>
+          <div id="dtMsg"></div>
+        </div>
       </section>
 
       <!-- PRAYER -->
@@ -372,23 +442,6 @@
         <div id="prayerList"></div>
       </section>
 
-      <!-- SERVING -->
-      <section class="view" id="view-serving">
-        <h1>Serving schedule</h1>
-        <div id="dutyCompose" class="card" hidden style="margin:6px 0 16px;">
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="field" style="flex:1;min-width:160px;"><label for="dtDate">Date(s)</label><input id="dtDate" type="text" placeholder="Click to pick day(s)" readonly /></div>
-            <div class="field" style="flex:1;min-width:150px;"><label for="dtRole">Duty</label><input id="dtRole" type="text" list="dutyRoles" placeholder="e.g. Song leader" /><datalist id="dutyRoles"><option>Song leader</option><option>Opening prayer</option><option>Lord's Supper</option><option>Closing prayer</option><option>Scripture reading</option><option>Announcements</option><option>Teacher</option></datalist></div>
-          </div>
-          <div id="dtDateChips" class="date-chips"></div>
-          <p class="muted" style="font-size:12px;margin:7px 0 0;">Click the field and choose one or more days. Non-adjacent is fine, so you can assign the same duty across several services at once.</p>
-          <div class="field"><label for="dtWho">Assigned to</label><input id="dtWho" type="text" placeholder="Name" /></div>
-          <div class="field"><label for="dtNoteInput">Note</label><input id="dtNoteInput" type="text" placeholder="Optional" /></div>
-          <button class="btn" id="dtPostBtn">Add assignment</button>
-          <div id="dtMsg"></div>
-        </div>
-        <div id="dutyList"></div>
-      </section>
 
       <!-- PROFILE -->
       <section class="view" id="view-profile">
@@ -876,28 +929,19 @@ $("prPostBtn").addEventListener("click", async ()=>{
 });
 
 // ---- Calendar / events ----
-let evWrite=false, evFull=false;
+let evWrite=false, evFull=false, dutyWrite=false;
 function fmtDate(d){ try{ return new Date(d+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return d; } }
-async function loadEvents(){
-  const today=new Date().toISOString().slice(0,10);
-  const [{data:evs,error:e1},{data:rs},{data:{user}}] = await Promise.all([
-    sb.from('events').select('*').gte('event_date',today).order('event_date',{ascending:true}),
-    sb.from('event_rsvps').select('event_id,user_id,response'),
-    sb.auth.getUser()
-  ]);
-  const list=$('eventList'); list.innerHTML='';
-  if(e1){ return; }
-  const counts={}, mine={};
-  (rs||[]).forEach(r=>{ counts[r.event_id]=counts[r.event_id]||{yes:0,maybe:0,no:0}; counts[r.event_id][r.response]++; if(user&&r.user_id===user.id) mine[r.event_id]=r.response; });
-  const rows=evs||[];
-  if(!rows.length){ const em=document.createElement('div'); em.className='muted'; em.style.cssText='font-size:14px;padding:4px 2px;'; em.textContent='No upcoming events.'; list.append(em); return; }
-  rows.forEach(ev=>{
-    const c=document.createElement('div'); c.className='ev';
-    const t=document.createElement('div'); t.className='et'; t.textContent=ev.title; c.append(t);
-    const w=document.createElement('div'); w.className='ewhen'; w.textContent=fmtDate(ev.event_date)+(ev.start_time?(' · '+ev.start_time):''); c.append(w);
-    if(ev.location){ const l=document.createElement('div'); l.className='eloc'; l.textContent='📍 '+ev.location; c.append(l); }
-    if(ev.description){ const d=document.createElement('div'); d.className='edesc'; d.textContent=ev.description; c.append(d); }
-    const row=document.createElement('div'); row.className='erow';
+function isoOf(dateObj){ return `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`; }
+
+// Build one event card (used in the calendar day panel).
+function renderEventCard(ev, counts, mine, user){
+  const c=document.createElement('div'); c.className='ev';
+  const t=document.createElement('div'); t.className='et'; t.textContent=ev.title; c.append(t);
+  const w=document.createElement('div'); w.className='ewhen'; w.textContent=ev.start_time||''; if(ev.start_time) c.append(w);
+  if(ev.location){ const l=document.createElement('div'); l.className='eloc'; l.textContent='📍 '+ev.location; c.append(l); }
+  if(ev.description){ const d=document.createElement('div'); d.className='edesc'; d.textContent=ev.description; c.append(d); }
+  const row=document.createElement('div'); row.className='erow';
+  if(evWrite || evFull || lvl('calendar')>=1){
     const grp=document.createElement('div'); grp.className='rsvp-group';
     const cc=counts[ev.id]||{yes:0,maybe:0,no:0};
     [['yes','Going',cc.yes],['maybe','Maybe',cc.maybe],['no',"Can't",cc.no]].forEach(([resp,label,n])=>{
@@ -906,28 +950,43 @@ async function loadEvents(){
         if(!user) return;
         if(mine[ev.id]===resp){ await sb.from('event_rsvps').delete().eq('event_id',ev.id).eq('user_id',user.id); }
         else { await sb.from('event_rsvps').upsert({ event_id:ev.id, user_id:user.id, response:resp, user_name:($("pName").value.trim()||user.email) }, { onConflict:'event_id,user_id' }); }
-        loadEvents();
+        loadCalendarMonth();
       };
       grp.append(b);
     });
     row.append(grp);
-    const owner = user && ev.created_by===user.id;
-    if(evFull || (evWrite && owner)){
-      const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Delete';
-      del.onclick=async()=>{ if(!confirm('Delete this event?'))return; await sb.from('events').delete().eq('id',ev.id); loadEvents(); };
-      row.append(del);
-      if(ev.series_id){
-        const dels=document.createElement('button'); dels.className='btn btn-ghost mini'; dels.textContent='Delete all dates';
-        dels.onclick=async()=>{ if(!confirm('Delete every date in this series?'))return; await sb.from('events').delete().eq('series_id',ev.series_id); loadEvents(); };
-        row.append(dels);
-      }
+  }
+  const owner = user && ev.created_by===user.id;
+  if(evFull || (evWrite && owner)){
+    const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Delete';
+    del.onclick=async()=>{ if(!confirm('Delete this event?'))return; await sb.from('events').delete().eq('id',ev.id); loadCalendarMonth(); };
+    row.append(del);
+    if(ev.series_id){
+      const dels=document.createElement('button'); dels.className='btn btn-ghost mini'; dels.textContent='Delete all dates';
+      dels.onclick=async()=>{ if(!confirm('Delete every date in this series?'))return; await sb.from('events').delete().eq('series_id',ev.series_id); loadCalendarMonth(); };
+      row.append(dels);
     }
-    c.append(row); list.append(c);
-  });
+  }
+  if(row.children.length) c.append(row);
+  return c;
 }
+// Build one duty item (used in the calendar day panel).
+function renderDutyItem(d){
+  const it=document.createElement('div'); it.className='duty-item';
+  const left=document.createElement('div');
+  const dr=document.createElement('span'); dr.className='dr'; dr.textContent=d.role;
+  const da=document.createElement('span'); da.className='da'; da.textContent=' — '+(d.assignee_name||'unassigned')+(d.note?(' ('+d.note+')'):'');
+  left.append(dr,da); it.append(left);
+  if(dutyWrite){
+    const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Remove'; del.onclick=async()=>{ await sb.from('duties').delete().eq('id',d.id); loadCalendarMonth(); }; it.append(del);
+    if(d.series_id){ const dels=document.createElement('button'); dels.className='btn btn-ghost mini'; dels.textContent='Remove all dates'; dels.onclick=async()=>{ if(!confirm('Remove this duty on every date in the series?'))return; await sb.from('duties').delete().eq('series_id',d.series_id); loadCalendarMonth(); }; it.append(dels); }
+  }
+  return it;
+}
+
 // Reusable multi-date picker: a flatpickr calendar where several days (non-adjacent
 // OK) can be clicked; selection is mirrored as removable chips below the field.
-const isoDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const isoDate=isoOf;
 function makeDatePicker(inputId, chipsId){
   const chips=$(chipsId);
   const label=d=>d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
@@ -946,11 +1005,13 @@ function makeDatePicker(inputId, chipsId){
   }
   return {
     get(){ return fp.selectedDates.slice().sort((a,b)=>a-b).map(isoDate); },
-    clear(){ fp.clear(); chips.innerHTML=''; }
+    clear(){ fp.clear(); chips.innerHTML=''; },
+    setDates(isoArr){ fp.setDate(isoArr, true); }
   };
 }
 function newSeriesId(){ return (crypto.randomUUID?crypto.randomUUID():('s'+Date.now()+Math.random().toString(16).slice(2))); }
 const evPicker=makeDatePicker('evDate','evDateChips');
+const dtPicker=makeDatePicker('dtDate','dtDateChips');
 $("evPostBtn").addEventListener("click", async ()=>{
   const title=$("evTitle").value.trim(), dates=evPicker.get();
   if(!title||!dates.length){ note($("evNote"),"Add a title and at least one date.","err"); return; }
@@ -960,34 +1021,10 @@ $("evPostBtn").addEventListener("click", async ()=>{
   const { error }=await sb.from('events').insert(dates.map(d=>({ ...base, event_date:d })));
   if(error){ note($("evNote"),error.message,"err"); return; }
   $("evTitle").value='';$("evTime").value='';$("evLoc").value='';$("evDesc").value='';evPicker.clear();
-  note($("evNote"), dates.length>1?(dates.length+" dates added."):"Added.", "ok"); loadEvents();
+  note($("evNote"), dates.length>1?(dates.length+" dates added."):"Added.", "ok");
+  $("eventCompose").hidden=true; loadCalendarMonth();
 });
-
-// ---- Duty scheduler ----
-let dutyWrite=false;
-async function loadDuties(){
-  const today=new Date().toISOString().slice(0,10);
-  const { data, error } = await sb.from('duties').select('*').gte('duty_date',today).order('duty_date',{ascending:true}).order('role',{ascending:true});
-  const list=$('dutyList'); list.innerHTML='';
-  if(error){ return; }
-  const rows=data||[];
-  if(!rows.length){ const em=document.createElement('div'); em.className='muted'; em.style.cssText='font-size:14px;padding:4px 2px;'; em.textContent='No upcoming assignments.'; list.append(em); return; }
-  let curDate=null, dayWrap=null;
-  rows.forEach(d=>{
-    if(d.duty_date!==curDate){ curDate=d.duty_date; dayWrap=document.createElement('div'); dayWrap.className='duty-day'; const h=document.createElement('div'); h.className='dd'; h.textContent=fmtDate(d.duty_date); dayWrap.append(h); list.append(dayWrap); }
-    const it=document.createElement('div'); it.className='duty-item';
-    const left=document.createElement('div');
-    const dr=document.createElement('span'); dr.className='dr'; dr.textContent=d.role;
-    const da=document.createElement('span'); da.className='da'; da.textContent=' — '+(d.assignee_name||'unassigned')+(d.note?(' ('+d.note+')'):'');
-    left.append(dr,da); it.append(left);
-    if(dutyWrite){
-      const del=document.createElement('button'); del.className='btn btn-ghost mini'; del.textContent='Remove'; del.onclick=async()=>{ await sb.from('duties').delete().eq('id',d.id); loadDuties(); }; it.append(del);
-      if(d.series_id){ const dels=document.createElement('button'); dels.className='btn btn-ghost mini'; dels.textContent='Remove all dates'; dels.onclick=async()=>{ if(!confirm('Remove this duty on every date in the series?'))return; await sb.from('duties').delete().eq('series_id',d.series_id); loadDuties(); }; it.append(dels); }
-    }
-    dayWrap.append(it);
-  });
-}
-const dtPicker=makeDatePicker('dtDate','dtDateChips');
+$("evCancelBtn").addEventListener("click", ()=>{ $("eventCompose").hidden=true; evPicker.clear(); });
 $("dtPostBtn").addEventListener("click", async ()=>{
   const role=$("dtRole").value.trim(), dates=dtPicker.get();
   if(!dates.length||!role){ note($("dtMsg"),"Add at least one date and a duty.","err"); return; }
@@ -997,8 +1034,100 @@ $("dtPostBtn").addEventListener("click", async ()=>{
   const { error }=await sb.from('duties').insert(dates.map(d=>({ ...base, duty_date:d })));
   if(error){ note($("dtMsg"),error.message,"err"); return; }
   $("dtRole").value='';$("dtWho").value='';$("dtNoteInput").value='';dtPicker.clear();
-  note($("dtMsg"), dates.length>1?(dates.length+" dates added."):"Added.", "ok"); loadDuties();
+  note($("dtMsg"), dates.length>1?(dates.length+" dates added."):"Added.", "ok");
+  $("dutyCompose").hidden=true; loadCalendarMonth();
 });
+$("dtCancelBtn").addEventListener("click", ()=>{ $("dutyCompose").hidden=true; dtPicker.clear(); });
+
+// ---- Big calendar (events + serving, merged) ----
+let calMonth=new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let calSelected=null; // iso string
+let calEventsByDate={}, calDutiesByDate={};
+let calRsvpCounts={}, calRsvpMine={}, calUser=null;
+const canSeeEvents=()=>lvl('calendar')>=1, canSeeDuties=()=>lvl('scheduling')>=1;
+async function loadCalendarMonth(){
+  const gridStart=new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
+  gridStart.setDate(gridStart.getDate()-gridStart.getDay());
+  const gridEnd=new Date(gridStart); gridEnd.setDate(gridEnd.getDate()+41);
+  const startIso=isoOf(gridStart), endIso=isoOf(gridEnd);
+  calEventsByDate={}; calDutiesByDate={}; calRsvpCounts={}; calRsvpMine={};
+  const { data:{ user } } = await sb.auth.getUser(); calUser=user;
+  if(canSeeEvents()){
+    const { data:evs } = await sb.from('events').select('*').gte('event_date',startIso).lte('event_date',endIso).order('event_date',{ascending:true}).order('start_time',{ascending:true,nullsFirst:false});
+    (evs||[]).forEach(ev=>{ (calEventsByDate[ev.event_date]=calEventsByDate[ev.event_date]||[]).push(ev); });
+    const ids=(evs||[]).map(e=>e.id);
+    if(ids.length){
+      const { data:rs } = await sb.from('event_rsvps').select('event_id,user_id,response').in('event_id',ids);
+      (rs||[]).forEach(r=>{ calRsvpCounts[r.event_id]=calRsvpCounts[r.event_id]||{yes:0,maybe:0,no:0}; calRsvpCounts[r.event_id][r.response]++; if(user&&r.user_id===user.id) calRsvpMine[r.event_id]=r.response; });
+    }
+  }
+  if(canSeeDuties()){
+    const { data:dts } = await sb.from('duties').select('*').gte('duty_date',startIso).lte('duty_date',endIso).order('duty_date',{ascending:true}).order('role',{ascending:true});
+    (dts||[]).forEach(d=>{ (calDutiesByDate[d.duty_date]=calDutiesByDate[d.duty_date]||[]).push(d); });
+  }
+  $("calLegendEv").hidden=!canSeeEvents(); $("calLegendDt").hidden=!canSeeDuties();
+  renderCalendarGrid();
+  if(!calSelected){
+    const todayIso=isoOf(new Date());
+    calSelected = (todayIso>=startIso && todayIso<=endIso) ? todayIso : startIso;
+  }
+  renderDayPanel();
+}
+function renderCalendarGrid(){
+  const grid=$("calGrid"); grid.innerHTML='';
+  $("calMonthLabel").textContent = calMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(w=>{ const el=document.createElement('div'); el.className='cal-wd'; el.textContent=w; grid.append(el); });
+  const gridStart=new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
+  gridStart.setDate(gridStart.getDate()-gridStart.getDay());
+  const todayIso=isoOf(new Date());
+  for(let i=0;i<42;i++){
+    const d=new Date(gridStart); d.setDate(d.getDate()+i);
+    const iso=isoOf(d);
+    const cell=document.createElement('button'); cell.type='button'; cell.className='cal-day';
+    if(d.getMonth()!==calMonth.getMonth()) cell.classList.add('other-month');
+    if(iso===todayIso) cell.classList.add('is-today');
+    if(iso===calSelected) cell.classList.add('is-selected');
+    const num=document.createElement('div'); num.className='cal-daynum'; num.textContent=d.getDate(); cell.append(num);
+    const dots=document.createElement('div'); dots.className='cal-dots';
+    const evCount=(calEventsByDate[iso]||[]).length, dtCount=(calDutiesByDate[iso]||[]).length;
+    for(let k=0;k<Math.min(evCount,3);k++){ const dot=document.createElement('span'); dot.className='dot dot-ev'; dots.append(dot); }
+    for(let k=0;k<Math.min(dtCount,3);k++){ const dot=document.createElement('span'); dot.className='dot dot-dt'; dots.append(dot); }
+    if(evCount||dtCount) cell.append(dots);
+    cell.onclick=()=>{ calSelected=iso; renderCalendarGrid(); renderDayPanel(); };
+    grid.append(cell);
+  }
+}
+function renderDayPanel(){
+  if(!calSelected) return;
+  const d=new Date(calSelected+'T00:00:00');
+  $("calDayTitle").textContent = d.toLocaleDateString(undefined,{weekday:'long', month:'long', day:'numeric'});
+  const evWrap=$("calDayEvents"); evWrap.innerHTML='';
+  const dtWrap=$("calDayDuties"); dtWrap.innerHTML='';
+  if(canSeeEvents()){
+    const evs=calEventsByDate[calSelected]||[];
+    if(evs.length){
+      const h=document.createElement('div'); h.className='cal-subhead'; h.textContent='Events'; evWrap.append(h);
+      evs.forEach(ev=> evWrap.append(renderEventCard(ev, calRsvpCounts, calRsvpMine, calUser)));
+    }
+  }
+  if(canSeeDuties()){
+    const dts=calDutiesByDate[calSelected]||[];
+    if(dts.length){
+      const h=document.createElement('div'); h.className='cal-subhead'; h.textContent='Serving'; dtWrap.append(h);
+      dts.forEach(d=> dtWrap.append(renderDutyItem(d)));
+    }
+  }
+  if(!evWrap.children.length && !dtWrap.children.length){
+    const em=document.createElement('div'); em.className='cal-day-empty'; em.textContent='Nothing on this day.'; evWrap.append(em);
+  }
+  $("calAddEventBtn").hidden = !(evWrite && canSeeEvents());
+  $("calAddDutyBtn").hidden = !(dutyWrite && canSeeDuties());
+}
+$("calPrev").addEventListener("click", ()=>{ calMonth=new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); loadCalendarMonth(); });
+$("calNext").addEventListener("click", ()=>{ calMonth=new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); loadCalendarMonth(); });
+$("calToday").addEventListener("click", ()=>{ calMonth=new Date(new Date().getFullYear(), new Date().getMonth(), 1); calSelected=isoOf(new Date()); loadCalendarMonth(); });
+$("calAddEventBtn").addEventListener("click", ()=>{ $("eventCompose").hidden=false; if(calSelected) evPicker.setDates([calSelected]); $("eventCompose").scrollIntoView({behavior:'smooth', block:'nearest'}); });
+$("calAddDutyBtn").addEventListener("click", ()=>{ $("dutyCompose").hidden=false; if(calSelected) dtPicker.setDates([calSelected]); $("dutyCompose").scrollIntoView({behavior:'smooth', block:'nearest'}); });
 
 // ---- Home feed: upcoming events ----
 async function loadHomeEvents(){
@@ -1030,13 +1159,12 @@ const IC = {
 const NAV = [
   {r:'home',label:'Home',icon:IC.home},
   {r:'directory',label:'Directory',icon:IC.dir,need:()=>approvedG && lvl('directory')>=1},
-  {r:'calendar',label:'Calendar',icon:IC.cal,need:()=>approvedG && lvl('calendar')>=1},
+  {r:'calendar',label:'Calendar',icon:IC.cal,need:()=>approvedG && (lvl('calendar')>=1 || lvl('scheduling')>=1)},
   {r:'prayer',label:'Prayer',icon:IC.pray,need:()=>approvedG && lvl('prayer_wall')>=1},
-  {r:'serving',label:'Serving',icon:IC.serve,need:()=>approvedG && lvl('scheduling')>=1},
   {r:'profile',label:'Profile',icon:IC.user},
   {r:'admin',label:'Admin',icon:IC.admin,need:()=>superAdmin || canApproveG}
 ];
-const ALLROUTES=['home','directory','calendar','prayer','serving','profile','admin'];
+const ALLROUTES=['home','directory','calendar','prayer','profile','admin'];
 let allowedRoutes=new Set(['home','profile']);
 function buildNav(){
   const items=NAV.filter(i=>!i.need||i.need());
@@ -1074,9 +1202,8 @@ async function loadHomeStats(){
 function loadForRoute(r){
   if(r==='home'){ if(approvedG){ loadHomeStats(); loadAnnouncements(); loadHomeEvents(); } }
   else if(r==='directory'){ loadDirectory(); setTimeout(()=>{ try{ map&&map.invalidateSize(); }catch(e){} },90); }
-  else if(r==='calendar'){ loadEvents(); }
+  else if(r==='calendar'){ loadCalendarMonth(); }
   else if(r==='prayer'){ loadPrayers(); }
-  else if(r==='serving'){ loadDuties(); }
   else if(r==='admin'){ if(canApproveG) loadPending(); if(superAdmin){ loadRolesList().then(()=>{ loadMembersAdmin(); loadRolesEditor(); }); } }
 }
 function route_(){
@@ -1110,8 +1237,6 @@ async function boot(){
   dutyWrite = lvl('scheduling')>=2;
   $("annCompose").hidden = !canWriteAnn;
   $("prayerCompose").hidden = !prWrite;
-  $("eventCompose").hidden = !evWrite;
-  $("dutyCompose").hidden = !dutyWrite;
   $("exportTools").hidden = !superAdmin;
   $("backupNote").hidden = !superAdmin;
   $("pendingBlock").hidden = !canApproveG;
