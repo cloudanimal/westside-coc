@@ -258,6 +258,13 @@
   .panel>h2{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px;}
   @media(max-width:1040px){ .home-cards{grid-template-columns:1fr;} }
   @media(max-width:560px){ .stat-tiles{grid-template-columns:1fr 1fr;} }
+  .res-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .res-card{display:flex;align-items:center;gap:11px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s;}
+  .res-card:hover{border-color:var(--gold-soft);transform:translateY(-1px);}
+  .res-card .res-ic{font-size:20px;line-height:1;flex:none;}
+  .res-card .res-tx b{display:block;font-size:14.5px;font-weight:700;}
+  .res-card .res-tx small{color:var(--ink-soft);font-size:12px;}
+  @media(max-width:700px){ .res-row{grid-template-columns:1fr;} }
   @media(max-width:899px){ .sidebar{display:none;} .main{padding-bottom:80px;} .bottomnav{display:block;} }
   [hidden]{display:none!important;}
 </style>
@@ -271,7 +278,6 @@
 <header class="topbar">
   <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 5h2v6h6v2h-6v14h-2V13H9v-2h6z"/></svg><span>Westside <em>members</em></span></a>
   <div class="tb-right">
-    <a href="/outreach/">Outreach</a>
     <a href="/app/help.html">Help</a>
     <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme">
       <svg class="ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -350,6 +356,12 @@
               <h2>Upcoming</h2>
               <div id="homeEvents"></div>
             </div>
+          </div>
+          <div class="cal-subhead" style="margin-top:22px;">Church resources</div>
+          <div class="res-row">
+            <a class="res-card" href="/wishlist/"><span class="res-ic">⭐</span><span class="res-tx"><b>App wishlist</b><small>Vote on features you want</small></span></a>
+            <a class="res-card" href="/roadmap/"><span class="res-ic">🗺️</span><span class="res-tx"><b>App roadmap</b><small>What we are building</small></span></a>
+            <a class="res-card" href="/outreach/"><span class="res-ic">📣</span><span class="res-tx"><b>Outreach plan</b><small>Our community outreach</small></span></a>
           </div>
         </div>
       </section>
