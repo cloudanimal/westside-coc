@@ -1,9 +1,16 @@
 name: Keep Supabase awake
 
-# Free-tier Supabase projects pause after ~7 days with no activity.
-# This pings the project once a day so it never goes to sleep.
-# The key below is the PUBLISHABLE (anon) key — safe to be public; it is
-# already embedded in the members app's page source.
+# Free-tier Supabase projects pause after ~7 days of low activity.
+# This runs once a day. The strongest activity signal is the authenticated
+# heartbeat WRITE (uses the service_role key, stored as a GitHub secret).
+# The anon reads are kept as a harmless extra touch.
+#
+# ONE-TIME SETUP (required for the heartbeat write):
+#   1. Supabase dashboard -> Project Settings -> API -> copy the
+#      "service_role" secret key (NOT the publishable/anon key).
+#   2. GitHub repo -> Settings -> Secrets and variables -> Actions ->
+#      New repository secret, named exactly:  SUPABASE_SERVICE_ROLE_KEY
+#   Until that secret is set, the write step skips itself (does not fail).
 
 on:
   schedule:
@@ -14,18 +21,32 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase (auth + database)
+      - name: Heartbeat write (authenticated — strongest activity signal)
+        env:
+          SR_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          URL="https://hpdikwatyhnctfhrrslh.supabase.co"
+          if [ -z "$SR_KEY" ]; then
+            echo "SUPABASE_SERVICE_ROLE_KEY secret not set yet — skipping the heartbeat write."
+            echo "Add it (see this file's header) so the daily write runs."
+            exit 0
+          fi
+          echo "Heartbeat write:"
+          code=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X POST "$URL/rest/v1/heartbeat" \
+            -H "apikey: $SR_KEY" \
+            -H "Authorization: Bearer $SR_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: resolution=merge-duplicates" \
+            -d "{\"id\":1,\"beat_at\":\"$(date -u +%FT%TZ)\"}")
+          echo "  HTTP $code"
+          # 2xx = success. Fail the job on anything else so a broken key is visible.
+          case "$code" in 2*) echo "  heartbeat ok";; *) echo "  heartbeat FAILED"; exit 1;; esac
+
+      - name: Anon touch (extra, non-authenticated)
         run: |
           URL="https://hpdikwatyhnctfhrrslh.supabase.co"
           KEY="sb_publishable_H7XQ6LPVRSQjC2I36iwbMA_TTrLr2VT"
-
           echo "Auth health check:"
-          curl -sS -o /dev/null -w "  HTTP %{http_code}\n" "$URL/auth/v1/health" -H "apikey: $KEY"
-
-          echo "Database read (this is what keeps Postgres active):"
-          curl -sS -o /dev/null -w "  HTTP %{http_code}\n" \
-            "$URL/rest/v1/profiles?select=id&limit=1" \
-            -H "apikey: $KEY" \
-            -H "Authorization: Bearer $KEY"
-
+          curl -sS -o /dev/null -w "  HTTP %{http_code}\n" "$URL/auth/v1/health" -H "apikey: $KEY" || true
           echo "Done."

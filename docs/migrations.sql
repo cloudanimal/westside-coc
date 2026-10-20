@@ -414,3 +414,19 @@ grant select, insert, update, delete on public.prayer_follows to authenticated;
 grant select, insert, update, delete on public.prayer_follows to service_role;
 grant select, insert, update, delete on public.duties to authenticated;
 grant select, insert, update, delete on public.duties to service_role;
+
+-- =====================================================================
+-- SECTION 10 — Keep-alive heartbeat table (added 2026-10-20)
+-- The daily GitHub Action writes a row here using the service_role key so
+-- the project registers a real authenticated DATABASE WRITE each day
+-- (a stronger "activity" signal than an anonymous read, to avoid the
+-- Free-plan auto-pause). Only service_role touches it; RLS is on with no
+-- policies, so anon/authenticated cannot see or change it.
+-- =====================================================================
+create table if not exists public.heartbeat (
+  id int primary key,
+  beat_at timestamptz not null default now()
+);
+alter table public.heartbeat enable row level security;
+grant select, insert, update on public.heartbeat to service_role;
+insert into public.heartbeat (id, beat_at) values (1, now()) on conflict (id) do nothing;
